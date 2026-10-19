@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><title>МКВ · Полный разбор программы C11</title>
+<style>
+:root{--paper:#fff;--canvas:#eff4fb;--ink:#15324f;--muted:#526779;--blue:#1d5fa3;--teal:#087b80;--line:#d7e2ee;--code:#132c43}
+*{box-sizing:border-box}html{scroll-behavior:auto;scroll-padding-top:32px}body{margin:0;background:var(--canvas);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.78}a{color:var(--blue);text-underline-offset:3px}a:hover{color:var(--teal)}a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--teal);outline-offset:4px}
+.layout{display:grid;grid-template-columns:260px minmax(0,1060px);gap:32px;max-width:1432px;margin:auto;padding:36px 28px 90px}.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow:auto;align-self:start;padding:12px 4px;font-size:13px;line-height:1.5}.sidebar summary{font-size:15px;font-weight:700;cursor:pointer;list-style:none;color:var(--ink);padding:0 8px 12px}.sidebar summary::after{content:" ▾";float:right;color:var(--muted)}.sidebar ol{padding:0;list-style:none;margin:0}.sidebar a{display:block;text-decoration:none;padding:7px 8px;border-left:2px solid transparent;color:var(--muted)}.sidebar a:hover{border-color:var(--blue);color:var(--blue);background:#e4edf8}.sidebar .links{margin:16px 8px;border-top:1px solid var(--line);padding-top:12px}.sidebar .links a{padding:5px 0}.reader{min-width:0;background:var(--paper);padding:48px 56px 64px;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 40px #15324f06}
+.eyebrow{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;color:var(--teal);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 18px}.opening{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--line)}.opening p{font-size:14px;color:var(--muted)}figure{margin:22px 0 0}figure svg{width:100%;height:auto;display:block}figcaption{font-size:12px;color:var(--muted);margin-top:8px}
+h1,h2,h3,h4{line-height:1.25;letter-spacing:-.02em;overflow-wrap:anywhere}h1{font-family:Georgia,"Times New Roman",serif;font-size:38px;font-weight:500;margin:22px 0 26px}h2{font-size:27px;margin:64px 0 22px;padding-top:10px;border-top:2px solid var(--line)}h3{font-size:21px;margin:36px 0 14px}h4{font-size:18px}p{margin:0 0 18px}li{margin-bottom:8px}ul,ol{padding-left:25px}blockquote{margin:24px 0;padding:18px 22px;border-left:3px solid var(--blue);background:#f0f5fb;color:#294a67}blockquote p:last-child{margin-bottom:0}strong{font-weight:650}code{font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;font-size:.86em;background:#edf3f9;color:#254a6d;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+.code-wrap{margin:22px 0 28px;overflow:hidden;border-radius:9px;background:var(--code);color:#e9f3fb;max-width:100%}.code-label{padding:8px 17px;border-bottom:1px solid #ffffff18;color:#a9c4d9;font:12px ui-monospace,monospace;letter-spacing:.03em}pre{margin:0;padding:18px 20px 23px;overflow-x:auto;line-height:1.65;font-size:13px;tab-size:4}pre code{font:inherit;color:inherit;background:none;padding:0;white-space:pre;overflow-wrap:normal}pre code[class*=language-]{font-size:13px}
+.table-scroll{overflow:auto;margin:24px 0 30px;max-width:100%;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.6;min-width:560px}th,td{padding:12px 14px;vertical-align:top;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{background:#edf4fb;color:#204b70;font-weight:650}tr:last-child td{border-bottom:0}td code{font-size:12px;white-space:nowrap}tbody tr:nth-child(even){background:#f8fafc}
+.math-block{overflow-x:auto;margin:25px 0;padding:20px 12px;background:#f7faff;border:1px solid #e0eaf5;border-radius:7px;max-width:100%;font-size:1.03em}.math-block math{min-width:max-content;margin:auto}.math-inline math{font-size:1.03em}math{font-family:"STIX Two Math","Cambria Math",serif}hr{border:0;border-top:1px solid var(--line);margin:32px 0}.end-note{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media(max-width:1100px){.layout{grid-template-columns:220px minmax(0,1fr);gap:20px;padding:24px 18px}.reader{padding:36px 32px}.sidebar{font-size:12px}h1{font-size:34px}}
+@media(max-width:760px){body{font-size:16px;line-height:1.75}.layout{display:block;padding:12px 10px 40px}.sidebar{position:static;max-height:none;margin-bottom:12px;background:#e5eef8;border-radius:10px;padding:14px}.sidebar summary{padding-bottom:4px}.sidebar ol{display:grid;grid-template-columns:1fr;max-height:260px;overflow:auto}.sidebar a{font-size:13px;padding:6px}.sidebar .links{display:flex;gap:18px;margin-top:8px}.reader{padding:26px 19px;border-radius:10px}h1{font-size:29px;line-height:1.22}h2{font-size:24px;margin-top:46px}h3{font-size:20px}pre{padding:15px;font-size:12px}pre code[class*=language-]{font-size:12px}.code-wrap{margin-left:-5px;margin-right:-5px}blockquote{padding:15px}.opening{margin-bottom:22px}figure{overflow:auto}figure svg{min-width:700px}.table-scroll{margin-left:-4px;margin-right:-4px}th,td{padding:10px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+@media print{@page{margin:18mm}body{background:white;color:#111;font-size:10pt;line-height:1.5}.layout{display:block;padding:0;max-width:none}.sidebar{display:none}.reader{border:0;box-shadow:none;padding:0}.opening{display:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid;margin-top:24pt}h3{font-size:13pt;break-after:avoid}.code-wrap{background:#f4f6f8;color:#111;border:1px solid #ccc;break-inside:auto}.code-label{color:#555;border-color:#ccc}pre{white-space:pre-wrap;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap!important;overflow-wrap:anywhere!important;font-size:8pt!important}.table-scroll,.math-block{overflow:visible}table{min-width:0;font-size:8pt}tr{break-inside:avoid}a{color:#111;text-decoration:none}}
+</style></head><body><div class="layout"><aside class="sidebar" aria-label="Оглавление"><details open><summary>Содержание разбора</summary><nav><ol><li><a href="#section-2">1. Проект и дисциплина</a></li>
+<li><a href="#section-3">2. Исходная формулировка задания</a></li>
+<li><a href="#section-4">3. Математическая постановка и принятые допущения</a></li>
+<li><a href="#section-5">4. Связь с лекционной теорией</a></li>
+<li><a href="#section-6">5. Почему используются размещения без повторений</a></li>
+<li><a href="#section-7">6. Обоснование выбранного алгоритма</a></li>
+<li><a href="#section-8">7. Лексикографический метод перечисления</a></li>
+<li><a href="#section-10">8. Алгоритмические операции и ручная трассировка</a></li>
+<li><a href="#section-14">9. Псевдокод</a></li>
+<li><a href="#section-15">10. Подробный разбор main.c</a></li>
+<li><a href="#section-26">11. Последовательность выполнения программы</a></li>
+<li><a href="#section-29">12. Параметры командной строки и формат вывода</a></li>
+<li><a href="#section-30">13. Компиляция и запуск в терминале macOS</a></li>
+<li><a href="#section-34">14. Примеры запуска и ожидаемые результаты</a></li>
+<li><a href="#section-35">15. Доказательство корректности алгоритма</a></li>
+<li><a href="#section-41">16. Доказательство полноты и завершения перечисления</a></li>
+<li><a href="#section-42">17. Доказательство отсутствия повторов</a></li>
+<li><a href="#section-43">18. Математические контрольные значения</a></li>
+<li><a href="#section-47">19. Формула включения-исключения</a></li>
+<li><a href="#section-48">20. Вычислительная сложность и память</a></li>
+<li><a href="#section-49">21. Результаты проверок на этапе разработки</a></li>
+<li><a href="#section-59">22. Вопросы и ответы для защиты</a></li>
+<li><a href="#section-60">23. Использованная литература</a></li></ol></nav></details><div class="links"><a href="README.md">README · Markdown</a><a href="main.c">Исходник C11</a></div></aside>
+<main class="reader"><header class="opening"><div class="eyebrow">МГТУ им. Н.Э. Баумана · Методы комбинаторных вычислений</div><p>Учебный разбор: от математической модели до полного потока результатов.</p><figure><svg viewBox="0 0 900 140" role="img" aria-labelledby="transition-title transition-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="transition-title">Три операции следующего размещения</title><desc id="transition-desc">К текущему размещению добавляются отсутствующие цифры по убыванию. Затем строится следующая полная перестановка. Из неё берутся первые M цифр.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#5b7792" stroke-width="1.5"/></marker></defs>
+<g font-family="system-ui,sans-serif" text-anchor="middle">
+<rect x="1" y="16" width="266" height="108" rx="10" fill="#edf4fc" stroke="#bed1e8"/>
+<text x="134" y="52" fill="#1d5fa3" font-size="25" font-weight="650">+</text><text x="134" y="82" fill="#15324f" font-size="17">Дополнение по убыванию</text><text x="134" y="106" fill="#516779" font-size="13">019 → 0198765432</text>
+<path d="M277 70H305" stroke="#5b7792" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="317" y="16" width="266" height="108" rx="10" fill="#eaf6f5" stroke="#b6d8d4"/>
+<text x="450" y="52" fill="#087b80" font-size="25" font-weight="650">L</text><text x="450" y="82" fill="#15324f" font-size="17">Следующая перестановка</text><text x="450" y="106" fill="#516779" font-size="13">0198765432 → 0213456789</text>
+<path d="M593 70H621" stroke="#5b7792" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="633" y="16" width="266" height="108" rx="10" fill="#fdf2e8" stroke="#e6ccb3"/>
+<text x="766" y="52" fill="#a95a22" font-size="25" font-weight="650">−</text><text x="766" y="82" fill="#15324f" font-size="17">Первые M цифр</text><text x="766" y="106" fill="#516779" font-size="13">0213456789 → 021</text>
+</g></svg><figcaption>Один переход размещения при M=3. Ведущий ноль отбрасывает фильтр натуральности.</figcaption></figure></header>
+<article id="canonical-content"><h1 id="section-1">Перечисление натуральных чисел с различными взаимодополняющими цифрами</h1>
+<h2 id="section-2">1. Проект и дисциплина</h2>
+<p>Учебная работа по дисциплине «Методы комбинаторных вычислений», МГТУ им. Н.Э. Баумана. Программа на ISO C11 перечисляет натуральные числа с различными цифрами, среди которых есть хотя бы одна взаимодополняющая пара. Результаты поступают в стандартный вывод в возрастающем порядке.</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">mkv_numbers/
+├── main.c
+├── Makefile
+├── README.md
+└── EXPLAINED.html
+</code></pre></div>
+<p><code>main.c</code> содержит всю программу. <code>Makefile</code> выполняет сборку, запуск и очистку. <code>README.md</code> — основной текстовый документ: постановка, теория, разбор кода, доказательства и подготовка к защите. <code>EXPLAINED.html</code> содержит тот же материал для автономного чтения в браузере, включая Safari: стили и формулы MathML встроены в файл, интернет не требуется.</p>
+<p>Для компиляции нужен C11-компилятор; на macOS используется Clang. Makefile необязателен. Python, сторонние библиотеки и дополнительная среда выполнения для сборки и запуска не нужны. После сборки временно появляется исполняемый файл <code>mkv_numbers</code>; <code>make clean</code> удаляет его. Каталог <code>.git</code> хранит историю версий и не является исходным файлом проекта.</p>
+<h2 id="section-3">2. Исходная формулировка задания</h2>
+<blockquote>
+<p>Перечислить все натуральные числа m из 10-х разрядов, в которых цифры попарно различны и значения разрядов хоть в 1 паре дополняют друг друга.</p>
+<p>При программной реализации этих перечислений значения параметров должны задавать опции командной строки с контролем допустимости их величин. Кроме того, следует предусмотреть значения параметров по умолчанию, если их опции не заданы, и стандартный вывод результатов.</p>
+</blockquote>
+<h2 id="section-4">3. Математическая постановка и принятые допущения</h2>
+<p>Формулировка неоднозначна: <code>m</code> может обозначать само число или количество цифр; «из 10-х разрядов» может означать десятичную запись либо ровно десять разрядов; сумма дополнения не названа. Эти вопросы нельзя разрешить одним выбором алгоритма.</p>
+<p>В этой работе принята <strong>рабочая модель проекта</strong>, а не доказанное намерение преподавателя:</p>
+<div class="math-block" data-latex="D=\{0,1,\ldots,9\},\quad 2\le m\le10,\quad S\in\{9,10\}."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>D</mi><mo>&#x0003D;</mo><mo stretchy="false">&#x0007B;</mo><mn>0</mn><mo>&#x0002C;</mo><mn>1</mn><mo>&#x0002C;</mo><mi>&#x02026;</mi><mo>&#x0002C;</mo><mn>9</mn><mo stretchy="false">&#x0007D;</mo><mo>&#x0002C;</mo><mspace width="1em" /><mn>2</mn><mo>&#x02264;</mo><mi>m</mi><mo>&#x02264;</mo><mn>10</mn><mo>&#x0002C;</mo><mspace width="1em" /><mi>S</mi><mo>&#x02208;</mo><mo stretchy="false">&#x0007B;</mo><mn>9</mn><mo>&#x0002C;</mo><mn>10</mn><mo stretchy="false">&#x0007D;</mo><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Нужно перечислить все векторы <span class="math-inline" data-latex="X=(x_1,\ldots,x_m)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>X</mi><mo>&#x0003D;</mo><mo stretchy="false">&#x00028;</mo><msub><mi>x</mi><mn>1</mn></msub><mo>&#x0002C;</mo><mi>&#x02026;</mi><mo>&#x0002C;</mo><msub><mi>x</mi><mi>m</mi></msub><mo stretchy="false">&#x00029;</mo></mrow></math></span>, для которых</p>
+<div class="math-block" data-latex="x_i\in D;\qquad i\ne j\Rightarrow x_i\ne x_j;\qquad x_1\ne0;
+\qquad\exists i&lt;j:\ x_i+x_j=S."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>&#x02208;</mo><mi>D</mi><mi>;</mi><mspace width="2em" /><mi>i</mi><mo>&#x02260;</mo><mi>j</mi><mo>&#x021D2;</mo><msub><mi>x</mi><mi>i</mi></msub><mo>&#x02260;</mo><msub><mi>x</mi><mi>j</mi></msub><mi>;</mi><mspace width="2em" /><msub><mi>x</mi><mn>1</mn></msub><mo>&#x02260;</mo><mn>0</mn><mi>;</mi><mspace width="2em" /><mo>&#x02203;</mo><mi>i</mi><mo>&#x0003C;</mo><mi>j</mi><mi>:</mi><mtext>&#x000A0;</mtext><msub><mi>x</mi><mi>i</mi></msub><mo>&#x0002B;</mo><msub><mi>x</mi><mi>j</mi></msub><mo>&#x0003D;</mo><mi>S</mi><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Вектор задаёт натуральное число <span class="math-inline" data-latex="N(X)=\sum_{i=1}^m x_i10^{m-i}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>N</mi><mo stretchy="false">&#x00028;</mo><mi>X</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><msubsup><mo>&#x02211;</mo><mrow><mi>i</mi><mo>&#x0003D;</mo><mn>1</mn></mrow><mi>m</mi></msubsup><msub><mi>x</mi><mi>i</mi></msub><msup><mn>10</mn><mrow><mi>m</mi><mo>&#x02212;</mo><mi>i</mi></mrow></msup></mrow></math></span>. Число и длина обозначены разными буквами, чтобы устранить перегрузку исходного <code>m</code>.</p>
+<p>Дополняются <strong>цифры</strong>, а не величины <span class="math-inline" data-latex="x_i10^{m-i}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>x</mi><mi>i</mi></msub><msup><mn>10</mn><mrow><mi>m</mi><mo>&#x02212;</mo><mi>i</mi></mrow></msup></mrow></math></span>. Позиции пары произвольны: соседство, симметрия и расположение на краях не требуются. Достаточно хотя бы одной пары. Несколько пар не создают нескольких результатов.</p>
+<p>При <code>S=9</code> пары: <code>{0,9}</code>, <code>{1,8}</code>, <code>{2,7}</code>, <code>{3,6}</code>, <code>{4,5}</code>.
+При <code>S=10</code>: <code>{1,9}</code>, <code>{2,8}</code>, <code>{3,7}</code>, <code>{4,6}</code>. Пара <code>{5,5}</code> запрещена различием цифр; 0 и 5 остаются без партнёров.</p>
+<p>Если преподаватель требует строго десятизначные числа, запускают <code>--digits 10</code>. Значения по умолчанию <code>m=4</code>, <code>S=10</code> являются принятыми проектными решениями. Они не приписываются учебным пособиям. В просмотренных разделах и заданиях 7–8 лабораторной определения нужной суммы дополнения нет.</p>
+<p>В формулах далее m обозначает длину записи, S — сумму пары, Q(m,S) — количество результатов. Прописная M в синтаксисе CLI является обозначением того же параметра длины.</p>
+<h2 id="section-5">4. Связь с лекционной теорией</h2>
+<p>Обозначения [1]–[9] относятся к учебным материалам из списка литературы в разделе 23. Номера PDF считаются с первой страницы файла, начиная с 1. Для основного пособия печатный номер на единицу меньше номера PDF в используемых разделах.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Источник</th><th>Проверенный раздел</th><th>Что используется</th></tr></thead><tbody><tr><td>[1] Волосатова, Родионов, 2011</td><td>Введение; «Сочетания элементов конечного множества»</td><td>Конфигурации, выбор элементов, специализированное систематическое перечисление</td></tr>
+<tr><td>[1]</td><td>«Лексиграфический порядок перестановок», PDF 47–49, печатные 46–48</td><td>Определение порядка; просмотр справа, транспозиция, разворот хвоста</td></tr>
+<tr><td>[1]</td><td>«Транспозиции смежных элементов», PDF 62–66, печатные 61–65</td><td>Минимальные изменения, итерационный выбор подвижного элемента и направлений; сравнение методов</td></tr>
+<tr><td>[1]</td><td>«Размещения различных элементов», PDF 96–100, печатные 95–99</td><td>Определение; алгоритм <code>+</code>, <code>L</code>, <code>−</code> на PDF 97; последнее размещение на PDF 98; формулы на PDF 98–99; сочетания с перестановками на PDF 100</td></tr>
+<tr><td>[2] «МКВ. Лекции. 1 модуль»</td><td>Введение; «Сочетания элементов конечного множества»</td><td>Неупорядоченная выборка без повторений; итерационные методы, лексиграфический порядок, минимальные изменения</td></tr>
+<tr><td>[3] «Перестановки различных элементов»</td><td>Определение, PDF 1; «Лексиграфический порядок перестановок», PDF 3–5</td><td>Подтверждение определения и тех же трёх действий перехода</td></tr>
+<tr><td>[4] Лабораторная № 2</td><td>Все 23 задания, особенно 7 и 8</td><td>В 7–8 перечисляются по возрастанию/убыванию пятизначные числа с различными цифрами меньше 5; в остальных заданиях явно названы специализированные методы</td></tr>
+<tr><td>[5] Жуков, Жуков, 2014</td><td>Гл. 1, §1.1 и §1.2.1; гл. 2, §2.1–2.2</td><td>Правила суммы/произведения, размещения, перестановки, сочетания, включение-исключение</td></tr>
+<tr><td>[6], [7] Два файла главы 2</td><td>§2.1, формула объединения (2.1); §2.2, теоремы 2.1 и 2.2</td><td>Объединение свойств, отсутствие свойств, отличие «хотя бы одно» от «ровно k»</td></tr>
+<tr><td>[8] «Цикловые классы подстановок и перестановок»</td><td>Представление подстановки циклами, спецификации цикловых классов</td><td>Проверено, что наша задача не ограничивает цикловую структуру; этот аппарат не нужен для генерации или подсчёта</td></tr>
+<tr><td>[9] «Размещения различных элементов»</td><td>Определение; абзац «На каждой следующей итерации...»; формулы и комбинированный метод</td><td>Та же схема дополнения по убыванию, следующей перестановки и усечения</td></tr></tbody></table></div>
+<p>В источниках употреблено написание <strong>«лексиграфический»</strong>. Здесь оба написания обозначают один и тот же порядок; далее используется «лексикографический».</p>
+<p>Содержательно совпадающие разделы [1], [3], [9] и глава 2 в [5]–[7] не считаются независимыми доказательствами. У DOCX нет неизменной пагинации: ссылки даны на заголовки и номера теорем. Страницы 5 и 24, указанные в оглавлении [5] для §1.2 и §2.2, являются номерами исходного издания, а не результатом нового рендеринга DOCX.</p>
+<p><strong>А. Лекционная теория:</strong> определения конфигураций; <span class="math-inline" data-latex="A_n^m=n!/(n-m)!"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>A</mi><mi>n</mi><mi>m</mi></msubsup><mo>&#x0003D;</mo><mi>n</mi><mo>&#x00021;</mo><mo>&#x0002F;</mo><mo stretchy="false">&#x00028;</mo><mi>n</mi><mo>&#x02212;</mo><mi>m</mi><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo></mrow></math></span>; <span class="math-inline" data-latex="A_n^m=C_n^m m!"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>A</mi><mi>n</mi><mi>m</mi></msubsup><mo>&#x0003D;</mo><msubsup><mi>C</mi><mi>n</mi><mi>m</mi></msubsup><mi>m</mi><mo>&#x00021;</mo></mrow></math></span>; описанные переходы; формула включения-исключения.</p>
+<p><strong>Б. Наши математические выводы:</strong> модель цифр, доказательство блочного перехода, фильтрация, пороги для сумм 9/10, специальные формулы подсчёта и контрольная таблица.</p>
+<p><strong>В. Проектные решения:</strong> диапазон параметров, значения по умолчанию, строгий CLI, массивы, формат строк, коды завершения, обработка вывода.</p>
+<p><strong>Г. Проверка на этапе разработки:</strong> Python <code>itertools.permutations</code>, перебор подмножеств, реализация формулы включения-исключения, потоковые инварианты и сравнение десятизначного потока с независимым перечислителем.</p>
+<h2 id="section-6">5. Почему используются размещения без повторений</h2>
+<p>Сочетание задаёт только состав выбранных цифр. Здесь <code>1289</code> и <code>9821</code> являются разными числами, поэтому порядок существенен. Нужно <strong>размещение без повторений</strong> из 10 цифр по m.</p>
+<p>По правилу произведения выбор позиций имеет соответственно 10, 9, ..., <span class="math-inline" data-latex="10-m+1"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>10</mn><mo>&#x02212;</mo><mi>m</mi><mo>&#x0002B;</mo><mn>1</mn></mrow></math></span> вариантов:</p>
+<div class="math-block" data-latex="A_{10}^m=10\cdot9\cdots(10-m+1)=\frac{10!}{(10-m)!}."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msubsup><mi>A</mi><mrow><mn>10</mn></mrow><mi>m</mi></msubsup><mo>&#x0003D;</mo><mn>10</mn><mo>&#x000B7;</mo><mn>9</mn><mo>&#x022EF;</mo><mo stretchy="false">&#x00028;</mo><mn>10</mn><mo>&#x02212;</mo><mi>m</mi><mo>&#x0002B;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mfrac><mrow><mn>10</mn><mo>&#x00021;</mo></mrow><mrow><mo stretchy="false">&#x00028;</mo><mn>10</mn><mo>&#x02212;</mo><mi>m</mi><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo></mrow></mfrac><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>То же следует из выбора m-элементного сочетания и его <span class="math-inline" data-latex="m!"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>m</mi><mo>&#x00021;</mo></mrow></math></span> порядков:
+<span class="math-inline" data-latex="A_{10}^m=C_{10}^m m!"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>A</mi><mrow><mn>10</mn></mrow><mi>m</mi></msubsup><mo>&#x0003D;</mo><msubsup><mi>C</mi><mrow><mn>10</mn></mrow><mi>m</mi></msubsup><mi>m</mi><mo>&#x00021;</mo></mrow></math></span>. Это соответствует определениям [1, раздел о размещениях] и [5, §1.2.1].</p>
+<p>Без ограничения суммы, но с запретом первого нуля, число кандидатов равно</p>
+<div class="math-block" data-latex="B_m=A_{10}^m-A_9^{m-1}=9\frac{9!}{(10-m)!}."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>B</mi><mi>m</mi></msub><mo>&#x0003D;</mo><msubsup><mi>A</mi><mrow><mn>10</mn></mrow><mi>m</mi></msubsup><mo>&#x02212;</mo><msubsup><mi>A</mi><mn>9</mn><mrow><mi>m</mi><mo>&#x02212;</mo><mn>1</mn></mrow></msubsup><mo>&#x0003D;</mo><mn>9</mn><mfrac><mrow><mn>9</mn><mo>&#x00021;</mo></mrow><mrow><mo stretchy="false">&#x00028;</mo><mn>10</mn><mo>&#x02212;</mo><mi>m</mi><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo></mrow></mfrac><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Первое слагаемое учитывает все размещения. Второе фиксирует ноль слева и размещает оставшиеся m−1 цифр из девяти.</p>
+<p>При m=10 выбираются все цифры, поэтому размещения становятся перестановками:</p>
+<div class="math-block" data-latex="A_{10}^{10}=10!=3\,628\,800;\qquad
+B_{10}=10!-9!=9\cdot9!=3\,265\,920."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msubsup><mi>A</mi><mrow><mn>10</mn></mrow><mrow><mn>10</mn></mrow></msubsup><mo>&#x0003D;</mo><mn>10</mn><mo>&#x00021;</mo><mo>&#x0003D;</mo><mn>3</mn><mspace width="0.167em" /><mn>628</mn><mspace width="0.167em" /><mn>800</mn><mi>;</mi><mspace width="2em" /><msub><mi>B</mi><mrow><mn>10</mn></mrow></msub><mo>&#x0003D;</mo><mn>10</mn><mo>&#x00021;</mo><mo>&#x02212;</mo><mn>9</mn><mo>&#x00021;</mo><mo>&#x0003D;</mo><mn>9</mn><mo>&#x000B7;</mo><mn>9</mn><mo>&#x00021;</mo><mo>&#x0003D;</mo><mn>3</mn><mspace width="0.167em" /><mn>265</mn><mspace width="0.167em" /><mn>920</mn><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Пары обеих сумм при использовании всех цифр существуют. Следовательно, последнее значение является числом результатов для обеих сумм.</p>
+<h2 id="section-7">6. Обоснование выбранного алгоритма</h2>
+<p>Ниже n обозначает размер алфавита, m — длину, <span class="math-inline" data-latex="A=A_n^m"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>A</mi><mo>&#x0003D;</mo><msubsup><mi>A</mi><mi>n</mi><mi>m</mi></msubsup></mrow></math></span>. Оценки исключают внешнюю стоимость вывода. Для методов с тем же фильтром дополнительно требуется до O(m²) на проверку пары.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Метод</th><th>Теория и полнота</th><th>Порядок</th><th>Работа генератора и память</th><th>Объяснение и выбор</th></tr></thead><tbody><tr><td>Перебор всех m-значных чисел</td><td>Полон после проверки каждого числа; не специализированный метод лекций</td><td>Возрастающий</td><td>O(m·10^m), O(m)</td><td>Прост, но проверяет огромное число заведомо повторяющихся цифр; при m=10 до 9 млрд чисел</td></tr>
+<tr><td>Полные перестановки n цифр, первые m позиций</td><td>Лекционный метод перестановок; при m&lt;n каждый префикс возникает (n−m)! раз</td><td>Префиксы идут неубывающе, с повторами</td><td>O(n·n!), O(n) при последовательном устранении повторов</td><td>Для m=n естественен; для m&lt;n тратит шаги на одинаковые размещения</td></tr>
+<tr><td>Лексиграфический алгоритм размещения</td><td>Непосредственно [1, PDF 97–98]; полон без повторов</td><td>Глобально возрастающий</td><td>O(nA), O(n)</td><td>Выбран: точно соответствует объекту и требуемому порядку</td></tr>
+<tr><td>Транспозиции смежных элементов</td><td>[1, PDF 62–66], все перестановки; для m&lt;n нужна дополнительная организация выбора</td><td>Порядок минимальных изменений</td><td>Базовый итерационный вариант O(n·n!), O(n); сортировка результатов требует их хранения</td><td>Полезен для обновляемых целевых функций; возрастающий числовой порядок не даёт</td></tr>
+<tr><td>Сочетания, затем перестановки</td><td>[1, PDF 99–100], каждый объект ровно один раз</td><td>Упорядочивание внутри сочетания не даёт общего числового порядка</td><td>Простой вариант O(nA), O(n); для сортировки всего вывода O(mA) памяти</td><td>Удобен для независимого подсчёта, но добавляет проблему объединения порядков</td></tr>
+<tr><td>Поиск с возвращением</td><td>Универсальный перебор упомянут во введении [1], полон при правильном обходе</td><td>Возрастающий при выборе цифр по возрастанию</td><td>Простой обход до O(nA), O(n+m) с учётом стека</td><td>Корректная альтернатива, но не демонстрирует запрошенный лекционный переход</td></tr></tbody></table></div>
+<p>Выбор основан на типе объекта, явном алгоритме источника и требовании порядка, а не на краткости кода. Многопоточность и дополнительная оптимизация здесь не нужны.</p>
+<h2 id="section-8">7. Лексикографический метод перечисления</h2>
+<p>Для двух различных векторов одинаковой длины сравнивают первую позицию, в которой они различаются. Меньшим считается вектор с меньшей цифрой в этой позиции. Например, <code>019 &lt; 021 &lt; 023</code>. Такое упорядочивание позволяет определять непосредственного преемника без хранения всех предыдущих объектов.</p>
+<h3 id="section-9">Переход к следующей полной перестановке</h3>
+<p>Функция <code>next_permutation</code> реализует [1, PDF 48; 3, PDF 4]:</p>
+<ol>
+<li>Найти справа самый правый индекс i с <span class="math-inline" data-latex="p_i&lt;p_{i+1}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>&#x0003C;</mo><msub><mi>p</mi><mrow><mi>i</mi><mo>&#x0002B;</mo><mn>1</mn></mrow></msub></mrow></math></span>.</li>
+<li>Если его нет, вся перестановка убывает: следующей нет.</li>
+<li>В убывающем правом хвосте найти справа первый элемент больше <span class="math-inline" data-latex="p_i"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>p</mi><mi>i</mi></msub></mrow></math></span>. Это минимальный из элементов, больших <span class="math-inline" data-latex="p_i"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>p</mi><mi>i</mi></msub></mrow></math></span>.</li>
+<li>Обменять эти элементы.</li>
+<li>Развернуть хвост после i, получая его возрастающий порядок.</li>
+</ol>
+<p>В C индексы начинаются с 0. Используется строгое сравнение: элементы по контракту попарно различны. При отсутствии перехода массив не изменяется.</p>
+<p>Переход применяется к полной перестановке десяти цифр. Для размещения длины m используется дополнительная организация: текущий префикс ставится в конец своего блока полных перестановок. Её точный смысл объясняется далее и доказывается в разделе 15.</p>
+<h2 id="section-10">8. Алгоритмические операции и ручная трассировка</h2>
+<h3 id="section-11">Начальная конфигурация</h3>
+<p>Для цифр <code>0..9</code> первое размещение имеет вид <code>(0,1,...,m−1)</code>. Оно содержит ведущий ноль, но генератор обязан перечислять весь класс размещений. Фильтр натуральности применяется отдельно.</p>
+<p>Замена алфавита <code>1..10</code> из лекции на <code>0..9</code> сохраняет все отношения порядка. При m=10 дополнение пусто, и переход становится обычной следующей перестановкой. Эти специализации не меняют принцип алгоритма.</p>
+<h3 id="section-12">Дополнение, переход и усечение</h3>
+<p>Функция <code>next_arrangement</code> буквально выполняет три операции источника:</p>
+<div class="math-block" data-latex="X\xrightarrow{+}\bigl(X,\operatorname{sort}_{\downarrow}(D\setminus X)\bigr)
+\xrightarrow{L}P&#x27;\xrightarrow{-}(p&#x27;_1,\ldots,p&#x27;_m)."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>X</mi><mover><mstyle scriptlevel="0"><mo>&#x2192;</mo></mstyle><mpadded width="+0.833em" lspace="0.556em" voffset="-.2em" height="-.2em"><mrow><mo>&#x0002B;</mo></mrow><mspace depth=".25em" /></mpadded></mover><mo stretchy="true" fence="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>X</mi><mo>&#x0002C;</mo><msub><mo>sort</mo><mrow><mo>&#x02193;</mo></mrow></msub><mo stretchy="false">&#x00028;</mo><mi>D</mi><mi>&#x029F5;</mi><mi>X</mi><mo stretchy="false">&#x00029;</mo><mo stretchy="true" fence="true" minsize="1.2em" maxsize="1.2em">)</mo><mover><mstyle scriptlevel="0"><mo>&#x2192;</mo></mstyle><mpadded width="+0.833em" lspace="0.556em" voffset="-.2em" height="-.2em"><mrow><mi>L</mi></mrow><mspace depth=".25em" /></mpadded></mover><msup><mi>P</mi><mi>&#x02032;</mi></msup><mover><mstyle scriptlevel="0"><mo>&#x2192;</mo></mstyle><mpadded width="+0.833em" lspace="0.556em" voffset="-.2em" height="-.2em"><mrow><mo>&#x02212;</mo></mrow><mspace depth=".25em" /></mpadded></mover><mo stretchy="false">&#x00028;</mo><msubsup><mi>p</mi><mn>1</mn><mi>&#x02032;</mi></msubsup><mo>&#x0002C;</mo><mi>&#x02026;</mi><mo>&#x0002C;</mo><msubsup><mi>p</mi><mi>m</mi><mi>&#x02032;</mi></msubsup><mo stretchy="false">&#x00029;</mo><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Дополнение строится заново на каждом шаге. Хвост после предыдущего перехода не переиспользуется: он мог оказаться возрастающим. Отбрасывание хвоста означает копирование только первых m элементов, а не сохранение всех его перестановок.</p>
+<h3 id="section-13">Ручная трассировка</h3>
+<p>Для m=3 и D=<code>0..9</code> разделитель <code>|</code> показывает границу размещения и дополнения. Индексы pivot ниже нулевые.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>X</th><th>Дополненная P</th><th>pivot и обмен</th><th>Следующая P</th><th>Новое X</th></tr></thead><tbody><tr><td>012</td><td>012|9876543</td><td>i=2, 2↔3</td><td>0132456789</td><td>013</td></tr>
+<tr><td>013</td><td>013|9876542</td><td>i=2, 3↔4</td><td>0142356789</td><td>014</td></tr>
+<tr><td>018</td><td>018|9765432</td><td>i=2, 8↔9</td><td>0192345678</td><td>019</td></tr>
+<tr><td>019</td><td>019|8765432</td><td>i=1, 1↔2</td><td>0213456789</td><td>021</td></tr>
+<tr><td>021</td><td>021|9876543</td><td>i=2, 1↔3</td><td>0231456789</td><td>023</td></tr>
+<tr><td>098</td><td>098|7654321</td><td>i=0, 0↔1</td><td>1023456789</td><td>102</td></tr>
+<tr><td>987</td><td>987|6543210</td><td>подъёма нет</td><td>перехода нет</td><td>конец</td></tr></tbody></table></div>
+<p>В частности, после <code>019</code> сразу следует <code>021</code>: <code>020</code> недопустимо из-за повторения 0. После <code>098</code> следует <code>102</code>, а не <code>099</code>, <code>100</code> или <code>101</code>. Размещения с первым нулём фильтруются, <code>102</code> при S=10 не выводится из-за отсутствия пары. <code>109</code> выводится, поскольку 1+9=10.</p>
+<p>Пример из [1, PDF 97] для алфавита <code>1..5</code>, m=3:
+<code>(4,1,5) + (3,2) → (4,1,5,3,2) → (4,2,1,3,5) → (4,2,1)</code>.</p>
+<h2 id="section-14">9. Псевдокод</h2>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">проверить все аргументы; при ошибке завершить с кодом 2
+если отдельно --help: вывести справку и проверить запись
+X = (0,1,...,m-1); count = 0
+повторять:
+    если X[0] != 0 и существует i &lt; j с X[i] + X[j] = S:
+        count += 1
+        если не count-only: вывести X и перевод строки
+    P = X + все отсутствующие цифры в порядке убывания
+    если следующей перестановки P не существует: закончить цикл
+    X = первые m элементов следующей перестановки P
+если count-only: вывести count и перевод строки
+проверить отложенную запись через fflush(stdout)
+</code></pre></div>
+<h2 id="section-15">10. Подробный разбор main.c</h2>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Функция</th><th>Контракт</th></tr></thead><tbody><tr><td><code>parse_integer</code></td><td>Непустая строка ASCII-цифр; проверяет <code>strtol</code>, <code>ERANGE</code>, конец разбора и диапазон; записывает int только после успеха</td></tr>
+<tr><td><code>parse_options</code></td><td>Проверяет все аргументы до перечисления/вывода; заполняет значения по умолчанию; отклоняет повторы и смешанный <code>--help</code></td></tr>
+<tr><td><code>next_permutation</code></td><td>Получает перестановку всех цифр 0..9; возвращает непосредственного преемника; <code>false</code> для последней</td></tr>
+<tr><td><code>next_arrangement</code></td><td>Получает m различных цифр 0..9; реализует <code>+</code>, <code>L</code>, <code>−</code>; при <code>false</code> размещение не меняет</td></tr>
+<tr><td><code>has_complementary_pair</code></td><td>Проверяет все <code>i&lt;j</code> до первого успеха; не считает число пар</td></tr>
+<tr><td><code>write_number</code></td><td>Создаёт ровно m цифр и <code>\n</code> в буфере из 11 char; проверяет результат <code>fwrite</code></td></tr>
+<tr><td><code>write_help</code></td><td>Выводит назначение, параметры, синтаксис, формат и примеры; сообщает об ошибке записи</td></tr>
+<tr><td><code>main</code></td><td>Инициализирует, перечисляет, фильтрует, считает и выводит; проверяет <code>fflush</code>; возвращает 0/1/2</td></tr></tbody></table></div>
+<p>Глобального изменяемого состояния нет. <code>BASE</code> — целочисленная константа, <code>Options</code> — обычная локальная структура, а не дополнительный архитектурный слой. Рекурсии, сторонних библиотек и динамической памяти в C нет. Счётчик <code>uint64_t</code> печатается через <code>PRIu64</code>; десятизначное число никогда не преобразуется в 32-битный int.</p>
+<p>Этот раздел относится к фактическому исходнику из файла <code>main.c</code> и полного листинга ниже. Нумерация строк начинается с первой директивы <code>#include</code>; файл содержит 223 строки. Номера нужны для сверки с редактором, а не являются частью C-кода.</p>
+<h3 id="section-16">10.1. Заголовки, константа, структура: строки 1–16</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Подключение</th><th>Для чего оно нужно именно здесь</th></tr></thead><tbody><tr><td><code>errno.h</code></td><td><code>errno</code> и <code>ERANGE</code>: отличить переполнение <code>strtol</code> от обычного значения</td></tr>
+<tr><td><code>inttypes.h</code></td><td><code>PRIu64</code>: переносимый формат печати <code>uint64_t</code></td></tr>
+<tr><td><code>stdbool.h</code></td><td>Логический тип <code>bool</code> и константы <code>true</code>, <code>false</code></td></tr>
+<tr><td><code>stdint.h</code></td><td>Счётчик фиксированной ширины <code>uint64_t</code></td></tr>
+<tr><td><code>stdio.h</code></td><td><code>stdout</code>, <code>stderr</code>, <code>fputs</code>, <code>fprintf</code>, <code>printf</code>, <code>fwrite</code>, <code>fflush</code>, <code>EOF</code></td></tr>
+<tr><td><code>stdlib.h</code></td><td>Преобразование строки функцией <code>strtol</code></td></tr>
+<tr><td><code>string.h</code></td><td>Точное сравнение имён опций через <code>strcmp</code></td></tr></tbody></table></div>
+<p><code>enum { BASE = 10 };</code> задаёт целочисленную константу времени компиляции. Это позволяет использовать <code>BASE</code> как размер обычного массива без выделения памяти в куче.</p>
+<p><code>Options</code> хранит четыре независимых параметра: длину, сумму, флаг подсчёта и флаг справки. Тип создан через <code>typedef struct</code>, поэтому далее достаточно имени <code>Options</code>. Это не класс, у структуры нет методов или скрытого состояния.</p>
+<p><code>static</code> перед вспомогательными функциями означает внутреннее связывание: функции доступны внутри этого файла. Оно не превращает их локальные массивы в глобальные или статические переменные.</p>
+<h3 id="section-17">10.2. parse_integer: строки 18–37</h3>
+<p>Контракт: получить строку и разрешённый диапазон; при успехе записать целое по адресу <code>value</code>, при ошибке вернуть <code>false</code>.</p>
+<p>Проверки выполняются по порядку:</p>
+<ol>
+<li><code>*text == &#39;\0&#39;</code> означает пустую строку. Она отклоняется до преобразования.</li>
+<li>Цикл по указателю <code>p</code> проверяет каждый байт. Разрешены только символы от <code>&#39;0&#39;</code> до <code>&#39;9&#39;</code>. Поэтому <code>+4</code>, <code>-4</code>, пробелы, <code>4.0</code>, <code>0x4</code>, буквы и цифры других алфавитов не принимаются.</li>
+<li><code>errno = 0</code> очищает прежнюю ошибку. Иначе старое значение <code>ERANGE</code> могло бы ошибочно дисквалифицировать корректное преобразование.</li>
+<li><code>strtol(text, &amp;end, 10)</code> читает десятичное <code>long</code>. Адрес <code>&amp;end</code> нужен, чтобы функция сообщила, где остановилась.</li>
+<li><code>ERANGE</code> означает переполнение; ненулевой символ по <code>end</code> — непрочитанный хвост. Затем проверяются границы <code>minimum</code> и <code>maximum</code>.</li>
+<li>Только после всех проверок значение приводится к <code>int</code> и записывается через <code>*value</code>.</li>
+</ol>
+<p>Приведение к int безопасно: принятый диапазон не превосходит 10. Ведущие нули в значении параметра разрешены: строка <code>04</code> задаёт число 4. Это не разрешает ведущий ноль в перечисляемых числах: параметры и результаты — разные сущности.</p>
+<h3 id="section-18">10.3. parse_options: строки 39–85</h3>
+<p><code>argc</code> содержит число аргументов вместе с именем программы. <code>argv</code> — массив указателей на строки. Поэтому разбор начинается с индекса 1.</p>
+<p>Выражение <code>(Options){4, 10, false, false}</code> — составной литерал структуры. Через <code>*options</code> сразу устанавливаются все значения по умолчанию. Программа не зависит от неинициализированных полей.</p>
+<p><code>strcmp(a, b) == 0</code> означает равенство строк. Сравнение указателей через <code>==</code> вместо <code>strcmp</code> не проверяло бы содержимое аргумента.</p>
+<p>У каждой опции есть свой путь:</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Опция</th><th>Что делает разбор</th></tr></thead><tbody><tr><td><code>--help</code></td><td>Требует <code>argc == 2</code>, затем выставляет флаг. Совместный вызов с любыми аргументами — ошибка</td></tr>
+<tr><td><code>--count-only</code></td><td>Проверяет, что флаг ещё не установлен, затем устанавливает его</td></tr>
+<tr><td><code>--digits</code> / <code>--sum</code></td><td>Выбирает соответствующее поле и признак повтора, проверяет наличие следующего аргумента, вызывает <code>parse_integer</code></td></tr>
+<tr><td>Всё остальное</td><td>Диагностика неизвестной опции или лишнего позиционного аргумента</td></tr></tbody></table></div>
+<p>Для числовых опций локальный <code>bool *seen</code> указывает либо на <code>seen_digits</code>, либо на <code>seen_sum</code>. Аналогично <code>int *value</code> указывает на поле длины либо суммы. Так одна короткая ветвь выполняет одинаковые проверки, не создавая отдельной системы регистрации опций.</p>
+<p><code>argv[++i]</code> сначала увеличивает индекс, затем получает значение опции. После окончания итерации внешний цикл увеличит индекс ещё раз и перейдёт к следующему имени опции. Перед этим проверено, что значение существует.</p>
+<p>При любой ошибке функция сразу возвращает <code>false</code>. <code>main</code> тогда завершится с кодом 2. Ни начальное размещение, ни цикл перечисления ещё не создавались, поэтому ошибочный вызов не успевает вывести часть результатов.</p>
+<h3 id="section-19">10.4. next_permutation: строки 87–111</h3>
+<p>Параметр <code>int permutation[BASE]</code> в объявлении функции передаётся как указатель на начало массива. Отдельная копия массива автоматически не создаётся: обмены меняют переданный массив.</p>
+<p>Первая проверка ищет pivot — последний подъём. Индекс начинается с <code>BASE - 2</code>, то есть 8: последний сравниваемый сосед находится в ячейке 9. Условие <code>pivot &gt;= 0 &amp;&amp; ...</code> использует короткое замыкание: при отрицательном индексе обращение к массиву справа от <code>&amp;&amp;</code> не выполняется.</p>
+<p>В алгоритме общего назначения, допускающем повторяющиеся элементы, часто используют сравнения <code>&gt;=</code> и <code>&lt;=</code>. Здесь элементы по контракту различны, поэтому достаточно <code>&gt;</code> и <code>&lt;</code>: равных соседей или равной замены быть не может.</p>
+<p>Если pivot не найден, весь массив убывает. Возврат <code>false</code> происходит до обменов, исходная перестановка остаётся нетронутой.</p>
+<p>Затем <code>successor</code> просматривает хвост справа налево. Хвост убывает, значит первый найденный элемент больше pivot является минимальной допустимой заменой. Нужный элемент существует: хотя бы сосед справа от pivot больше его по определению подъёма.</p>
+<p>Переменная <code>temporary</code> обеспечивает обмен без потери старого значения. После обмена два индекса <code>left</code> и <code>right</code> идут навстречу друг другу и разворачивают хвост. На центральном элементе нечётного хвоста обмен не нужен, поэтому условие строгое: <code>left &lt; right</code>.</p>
+<p>Пример: <code>0198765432</code> → pivot равен 1 на позиции 1 → минимальная замена 2 → после обмена <code>0298765431</code> → после разворота хвоста <code>0213456789</code>. Первые три цифры меняются с <code>019</code> на <code>021</code>.</p>
+<h3 id="section-20">10.5. next_arrangement: строки 113–138</h3>
+<p><code>used[10]</code> изначально полностью заполнен <code>false</code>. Первый цикл копирует m текущих цифр во временную перестановку и отмечает их присутствие. Индекс <code>used[arrangement[i]]</code> безопасен: инвариант гарантирует цифры от 0 до 9.</p>
+<p><code>position = length</code> указывает на первое свободное место после префикса. Цикл <code>digit = 9 ... 0</code> добавляет только неотмеченные цифры. Их ровно <code>10 - length</code>, поэтому после дополнения записаны ровно десять ячеек, а индекс не выходит за границу.</p>
+<p>Временный массив <code>permutation</code> не инициализируется нулями: это не требуется, поскольку первые m ячеек записывает первый цикл, а остальные <code>10-m</code> — второй. До чтения заполнена каждая ячейка.</p>
+<p>Вызов <code>next_permutation</code> выполняет лекционную операцию L. Если преемника нет, внешний массив размещения не меняется. Если преемник есть, копируются только первые m ячеек. Так усечение реализуется без удаления элементов или динамической памяти.</p>
+<p>При m=10 второй цикл ничего не добавляет, поскольку все цифры отмечены. Остальные действия остаются теми же. Отдельного алгоритма для этого случая нет.</p>
+<h3 id="section-21">10.6. has_complementary_pair: строки 140–151</h3>
+<p>Внешний индекс i выбирает первую позицию пары, внутренний j начинается с <code>i + 1</code>. Поэтому каждая неупорядоченная пара различных позиций проверяется один раз; позиция не сравнивается сама с собой.</p>
+<p>Проверяется именно <code>digits[i] + digits[j] == sum</code>. Расстояние между позициями не участвует в условии. Возврат <code>true</code> при первой найденной паре означает «существует хотя бы одна». Он не отбрасывает числа с двумя или более парами.</p>
+<p>Если оба цикла завершились без успеха, возвращается <code>false</code>. <code>const</code> перед массивом показывает, что функция только читает цифры.</p>
+<h3 id="section-22">10.7. write_number: строки 153–163</h3>
+<p>Максимум нужно записать 10 цифр и перевод строки, поэтому достаточно <code>char line[11]</code>. Выражение <code>&#39;0&#39; + digits[i]</code> переводит числовое значение цифры в её символ. Арифметика десятизначного числа при этом вообще не вычисляется.</p>
+<p>В конце добавляется <code>\n</code>. Завершающий нулевой байт не требуется: это не строка для <code>printf(&quot;%s&quot;, ...)</code>, а буфер известной длины для <code>fwrite</code>. Вызов передаёт размер элемента 1 и число элементов <code>length + 1</code>; возврат должен совпасть с этим количеством.</p>
+<p>Такой вывод безопасен для <code>9876543210</code>, которое не помещается в 32-битный signed int. В int хранятся только отдельные цифры и небольшие индексы.</p>
+<h3 id="section-23">10.8. write_help: строки 165–183</h3>
+<p>Соседние строковые литералы C автоматически объединяются компилятором. Обратный слеш n задаёт перевод строки внутри текста. <code>fputs</code> выводит справку; неотрицательный возврат означает успешное принятие данных библиотекой stdio. Финальная проверка <code>fflush</code> всё равно нужна: запись могла пока попасть только в буфер.</p>
+<p>Справка перечисляет назначение, синтаксис, диапазоны, значения по умолчанию, запрет повторов, правило отдельного <code>--help</code>, формат вывода и команды-примеры. Английский текст справки не влияет на математическую модель или формат числовых результатов.</p>
+<h3 id="section-24">10.9. main: строки 185–223</h3>
+<p>Порядок действий важен:</p>
+<ol>
+<li>Создать локальные параметры и полностью проверить CLI. При ошибке немедленно вернуть 2.</li>
+<li>Для отдельного <code>--help</code> вывести справку, затем перейти к общей проверке записи.</li>
+<li>Для обычного режима заполнить первые m цифр значениями <code>0,1,...,m−1</code>. Полная нулевая инициализация массива также делает состояние явным для GCC.</li>
+<li>Создать нулевой <code>uint64_t count</code> и войти в <code>do ... while</code>.</li>
+<li>Сначала проверить ненулевую первую цифру. Благодаря <code>&amp;&amp;</code> проверка пары для ведущего нуля не вызывается.</li>
+<li>Если есть пара, увеличить счётчик. Вывести число только при выключенном <code>count_only</code>.</li>
+<li>При ошибке записи установить <code>output_ok = false</code> и прекратить перебор. Успешное количество после частично неудачного вывода не печатается.</li>
+<li>В условии цикла построить следующее размещение. Если его нет, цикл закончен.</li>
+<li>В режиме подсчёта вывести накопленное количество с форматом <code>PRIu64</code>.</li>
+<li>В обоих режимах проверить <code>fflush(stdout)</code>. При ошибке вернуть 1; иначе вернуть 0.</li>
+</ol>
+<p><code>do ... while</code> выбран потому, что начальная конфигурация уже существует и должна быть рассмотрена до первого перехода. Обычный цикл с переходом до обработки мог бы пропустить её. Хотя первое размещение отбрасывается по ведущему нулю, корректность генератора от этого не должна зависеть.</p>
+<p>Для обычного вывода выражение <code>!options.count_only &amp;&amp; !write_number(...)</code> не вызывает <code>write_number</code>, когда включён подсчёт. Но сам цикл и <code>next_arrangement</code> работают в обоих режимах. Поэтому <code>--count-only</code> — отключение вывода чисел, а не замена перечисления формулой.</p>
+<p>Строка <code>printf(&quot;%&quot; PRIu64 &quot;\n&quot;, count)</code> после препроцессора превращается в подходящий платформе формат. Нельзя без проверки предполагать, что <code>uint64_t</code> обязательно соответствует <code>unsigned long long</code>.</p>
+<h3 id="section-25">10.10. Полный исходный код main.c</h3>
+<p>Листинг совпадает с принятым исходником побайтно; номера строк в заголовках относятся к нему.</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">c</div><pre><code class="language-c">#include &lt;errno.h&gt;
+#include &lt;inttypes.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+enum { BASE = 10 };
+
+typedef struct {
+    int digits;
+    int sum;
+    bool count_only;
+    bool help;
+} Options;
+
+/* Accept only nonempty ASCII decimal strings; reject overflow and range errors. */
+static bool parse_integer(const char *text, int minimum, int maximum, int *value)
+{
+    if (*text == '\0') {
+        return false;
+    }
+    for (const char *p = text; *p != '\0'; ++p) {
+        if (*p &lt; '0' || *p &gt; '9') {
+            return false;
+        }
+    }
+    errno = 0;
+    char *end = NULL;
+    long parsed = strtol(text, &amp;end, 10);
+    if (errno == ERANGE || *end != '\0' || parsed &lt; minimum || parsed &gt; maximum) {
+        return false;
+    }
+    *value = (int)parsed;
+    return true;
+}
+
+/* Validate every argument before enumeration or help output begins. */
+static bool parse_options(int argc, char **argv, Options *options)
+{
+    bool seen_digits = false;
+    bool seen_sum = false;
+    *options = (Options){4, 10, false, false};
+
+    for (int i = 1; i &lt; argc; ++i) {
+        const char *arg = argv[i];
+        if (strcmp(arg, &quot;--help&quot;) == 0) {
+            if (argc != 2) {
+                fputs(&quot;error: --help must be used alone\n&quot;, stderr);
+                return false;
+            }
+            options-&gt;help = true;
+        } else if (strcmp(arg, &quot;--count-only&quot;) == 0) {
+            if (options-&gt;count_only) {
+                fputs(&quot;error: duplicate --count-only\n&quot;, stderr);
+                return false;
+            }
+            options-&gt;count_only = true;
+        } else if (strcmp(arg, &quot;--digits&quot;) == 0 || strcmp(arg, &quot;--sum&quot;) == 0) {
+            bool is_digits = strcmp(arg, &quot;--digits&quot;) == 0;
+            bool *seen = is_digits ? &amp;seen_digits : &amp;seen_sum;
+            if (*seen) {
+                fprintf(stderr, &quot;error: duplicate %s\n&quot;, arg);
+                return false;
+            }
+            *seen = true;
+            if (i + 1 == argc) {
+                fprintf(stderr, &quot;error: %s requires a value\n&quot;, arg);
+                return false;
+            }
+            int *value = is_digits ? &amp;options-&gt;digits : &amp;options-&gt;sum;
+            int minimum = is_digits ? 2 : 9;
+            if (!parse_integer(argv[++i], minimum, 10, value)) {
+                fprintf(stderr, &quot;error: %s requires decimal digits in range %s\n&quot;,
+                        arg, is_digits ? &quot;2..10&quot; : &quot;9..10&quot;);
+                return false;
+            }
+        } else {
+            fprintf(stderr, &quot;error: unknown option or positional argument: %s\n&quot;, arg);
+            return false;
+        }
+    }
+    return true;
+}
+
+/* Replace a distinct-element permutation by its immediate lexicographic successor.
+ * Return false without modifying it when its order is entirely decreasing. */
+static bool next_permutation(int permutation[BASE])
+{
+    int pivot = BASE - 2;
+    while (pivot &gt;= 0 &amp;&amp; permutation[pivot] &gt; permutation[pivot + 1]) {
+        --pivot;
+    }
+    if (pivot &lt; 0) {
+        return false;
+    }
+    int successor = BASE - 1;
+    while (permutation[successor] &lt; permutation[pivot]) {
+        --successor;
+    }
+    int temporary = permutation[pivot];
+    permutation[pivot] = permutation[successor];
+    permutation[successor] = temporary;
+    for (int left = pivot + 1, right = BASE - 1; left &lt; right; ++left, --right) {
+        temporary = permutation[left];
+        permutation[left] = permutation[right];
+        permutation[right] = temporary;
+    }
+    return true;
+}
+
+/* Precondition: 2 &lt;= length &lt;= 10, distinct digits in 0..9.
+ * Lecture's (+, L, -): append missing digits in decreasing order,
+ * take next full permutation, retain its first length digits.
+ * On false, arrangement remains unchanged. */
+static bool next_arrangement(int arrangement[BASE], int length)
+{
+    bool used[BASE] = {false};
+    int permutation[BASE];
+    for (int i = 0; i &lt; length; ++i) {
+        permutation[i] = arrangement[i];
+        used[arrangement[i]] = true;
+    }
+    int position = length;
+    for (int digit = BASE - 1; digit &gt;= 0; --digit) {
+        if (!used[digit]) {
+            permutation[position++] = digit;
+        }
+    }
+    if (!next_permutation(permutation)) {
+        return false;
+    }
+    for (int i = 0; i &lt; length; ++i) {
+        arrangement[i] = permutation[i];
+    }
+    return true;
+}
+
+/* Test existence, not number, adjacency, or positions of complementary pairs. */
+static bool has_complementary_pair(const int digits[BASE], int length, int sum)
+{
+    for (int i = 0; i &lt; length; ++i) {
+        for (int j = i + 1; j &lt; length; ++j) {
+            if (digits[i] + digits[j] == sum) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/* Emit digits directly, including ten-digit values beyond signed 32-bit range. */
+static bool write_number(const int digits[BASE], int length)
+{
+    char line[BASE + 1];
+    for (int i = 0; i &lt; length; ++i) {
+        line[i] = (char)('0' + digits[i]);
+    }
+    line[length] = '\n';
+    size_t size = (size_t)length + 1;
+    return fwrite(line, 1, size, stdout) == size;
+}
+
+static bool write_help(void)
+{
+    return fputs(
+        &quot;Enumerate decimal natural numbers with distinct digits and at least\n&quot;
+        &quot;one pair of positions i &lt; j whose digits sum to S. Output is ascending.\n&quot;
+        &quot;Usage: mkv_numbers [--digits M] [--sum S] [--count-only]\n&quot;
+        &quot;       mkv_numbers --help\n&quot;
+        &quot;  --digits M     Number of decimal digits: 2..10 (default: 4).\n&quot;
+        &quot;  --sum S        Complementary digit sum: 9 or 10 (default: 10).\n&quot;
+        &quot;  --count-only   Enumerate all candidates; print only result count.\n&quot;
+        &quot;  --help         Show this help; must be used alone.\n&quot;
+        &quot;Values: nonempty ASCII decimal digit strings, separate arguments.\n&quot;
+        &quot;Leading zeroes in parameter values are accepted. No repeated options.\n&quot;
+        &quot;Output: one number per line, or one count followed by a newline.\n&quot;
+        &quot;Examples:\n&quot;
+        &quot;  ./mkv_numbers --digits 2 --sum 10\n&quot;
+        &quot;  ./mkv_numbers --digits 4 --sum 10 --count-only\n&quot;
+        &quot;  ./mkv_numbers --digits 10 --sum 9 &gt; numbers.txt\n&quot;, stdout) &gt;= 0;
+}
+
+int main(int argc, char **argv)
+{
+    Options options;
+    if (!parse_options(argc, argv, &amp;options)) {
+        return 2;
+    }
+    bool output_ok = true;
+    if (options.help) {
+        output_ok = write_help();
+    } else {
+        int digits[BASE] = {0};
+        for (int i = 0; i &lt; options.digits; ++i) {
+            digits[i] = i;
+        }
+        uint64_t count = 0;
+        do {
+            if (digits[0] != 0 &amp;&amp;
+                has_complementary_pair(digits, options.digits, options.sum)) {
+                ++count;
+                if (!options.count_only &amp;&amp; !write_number(digits, options.digits)) {
+                    output_ok = false;
+                    break;
+                }
+            }
+        } while (next_arrangement(digits, options.digits));
+        if (options.count_only) {
+            output_ok = printf(&quot;%&quot; PRIu64 &quot;\n&quot;, count) &gt;= 0;
+        }
+    }
+    /* Buffered writes can fail only when the final buffer is flushed. */
+    if (fflush(stdout) == EOF) {
+        output_ok = false;
+    }
+    if (!output_ok) {
+        fputs(&quot;error: cannot write to stdout\n&quot;, stderr);
+        return 1;
+    }
+    return 0;
+}
+</code></pre></div>
+<h2 id="section-26">11. Последовательность выполнения программы</h2>
+<p>При запуске операционная система передаёт <code>argc</code> и <code>argv</code> в <code>main</code>. Сначала целиком проверяются параметры; затем выбирается справка либо перечисление. При перечислении состояние начинается с минимального размещения, обрабатывается фильтрами, при необходимости выводится и заменяется следующим. Отсутствие преемника завершает цикл. Последними выполняются вывод счётчика, если он запрошен, и проверка отложенной записи.</p>
+<h3 id="section-27">Схема вызовов и ответственности</h3>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">main
+├── parse_options
+│   └── parse_integer
+├── write_help                    [только отдельный --help]
+├── цикл всех размещений
+│   ├── проверка первой цифры
+│   ├── has_complementary_pair
+│   ├── write_number              [когда count-only выключен]
+│   └── next_arrangement
+│       └── next_permutation
+├── printf(count)                 [когда count-only включён]
+└── fflush(stdout) и код завершения
+</code></pre></div>
+<p>Генератор отвечает за класс размещений и порядок, фильтры — за ограничения задачи, вывод — за формат и ошибки записи. Это разделение позволяет доказывать каждую часть отдельно и не смешивать алгоритм перечисления с независимой формулой количества.</p>
+<h3 id="section-28">Пример пути одного результата</h3>
+<p>Для <code>--digits 2 --sum 10</code> параметры становятся <code>(2,10,false,false)</code>. Генератор начинает с <code>01</code>; размещения с первым нулём не проходят первый фильтр. После <code>09</code> идёт <code>10</code>: ведущего нуля нет, но сумма цифр равна 1. Далее проверяются <code>12</code>, <code>13</code>, …, <code>19</code>; у <code>19</code> сумма равна 10, счётчик увеличивается и выводится <code>19 </code>. Последующие подходящие размещения дают <code>28</code>, <code>37</code> и остальные строки. В режиме <code>--count-only</code> путь тот же, но <code>write_number</code> не вызывается; после конца цикла печатается <code>8</code>.</p>
+<p>При отдельном <code>--help</code> генератор вообще не запускается. При неверных параметрах программа заканчивается ещё до инициализации размещения.</p>
+<h2 id="section-29">12. Параметры командной строки и формат вывода</h2>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">./mkv_numbers [--digits M] [--sum S] [--count-only]
+./mkv_numbers --help
+</code></pre></div>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Опция</th><th>Значение</th><th>По умолчанию</th></tr></thead><tbody><tr><td><code>--digits M</code></td><td>Длина десятичной записи, 2..10</td><td>4</td></tr>
+<tr><td><code>--sum S</code></td><td>Сумма пары разных цифр, 9 или 10</td><td>10</td></tr>
+<tr><td><code>--count-only</code></td><td>Полное перечисление кандидатов, но вывод только счётчика</td><td>выключен</td></tr>
+<tr><td><code>--help</code></td><td>Справка; допускается только как единственный аргумент</td><td>выключен</td></tr></tbody></table></div>
+<p>Порядок трёх обычных опций произволен. Каждая опция допускается не больше одного раза. Значение передаётся <strong>отдельным аргументом</strong>; синтаксис <code>--digits=4</code> не поддерживается. Позиционных аргументов и сокращений нет.</p>
+<p>Числовая строка состоит только из ASCII <code>0..9</code>; ведущие нули в параметрах допустимы (<code>--digits 04</code>). Знаки <code>+</code>/<code>-</code>, пробелы, дробная/экспоненциальная/шестнадцатеричная запись, Unicode-цифры, пустая строка, смешанный текст, переполнение и выход за диапазон отклоняются. Один лишь <code>strtol</code> недостаточен: он принимает некоторые из этих записей, поэтому до него выполняется проверка символов.</p>
+<p>При CLI-ошибке: диагностическое сообщение в stderr, пустой stdout, код 2, перечисление не запускается. При успешной работе: код 0, stderr пуст. Смешанный вызов <code>--help</code> с другими аргументами является ошибкой, а не способом скрыть некорректные параметры.</p>
+<p>Обычный stdout содержит только результаты по одному на строку. В <code>--count-only</code> это одна строка количества. Заголовки, комментарии и прогресс не добавляются. Перенаправление в файл поддерживается.</p>
+<p>Ошибка <code>fwrite</code>, <code>fputs</code>, <code>printf</code> или финального <code>fflush</code> даёт сообщение <code>error: cannot write to stdout</code> в stderr и код 1. Часть вывода до ошибки могла уже попасть получателю. На POSIX закрытая труба также может завершить процесс стандартным сигналом <code>SIGPIPE</code>: это неуспешное завершение, но текст диагностики при сигнале не гарантирован. Обработка <code>SIGPIPE</code> не добавлена, поскольку этот сигнал не входит в ISO C11. При разработке проверка закрытой трубы принимала оба корректных неуспешных исхода.</p>
+<h2 id="section-30">13. Компиляция и запуск в терминале macOS</h2>
+<p>Откройте Terminal и перейдите в папку проекта. Команды используют текущую домашнюю директорию, а не имя пользователя из другого компьютера.</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">cd &quot;$HOME/Desktop/mkv_numbers&quot;
+clang -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror \
+  main.c -o mkv_numbers
+./mkv_numbers
+</code></pre></div>
+<p>Компиляция напрямую через <code>clang</code> не зависит от Makefile. После неё получается обычный исполняемый файл; дополнительный интерпретатор не нужен.</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">./mkv_numbers --digits 4 --sum 10
+./mkv_numbers --digits 10 --sum 10 --count-only
+./mkv_numbers --help
+</code></pre></div>
+<p>Для выбора системного компилятора macOS независимо от PATH можно заменить <code>clang</code> на <code>/usr/bin/clang</code>. Команда <code>/usr/bin/gcc</code> на macOS может запускать Apple Clang; имя команды само по себе не доказывает использование GNU GCC.</p>
+<h3 id="section-31">Сборка через Makefile</h3>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">make
+make run
+make run ARGS=&quot;--digits 4 --sum 10&quot;
+make run ARGS=&quot;--digits 10 --sum 10 --count-only&quot;
+make clean
+</code></pre></div>
+<p><code>make</code> собирает <code>mkv_numbers</code>, если исходник или Makefile новее исполняемого файла. <code>make run</code> сначала собирает программу при необходимости, затем запускает её; без ARGS действуют значения по умолчанию. <code>make clean</code> удаляет только исполняемый файл <code>mkv_numbers</code>.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Переменная</th><th>Назначение</th></tr></thead><tbody><tr><td><code>CC</code></td><td>Компилятор, по умолчанию <code>clang</code>; можно задать <code>make CC=/usr/bin/clang</code></td></tr>
+<tr><td><code>CFLAGS</code></td><td>ISO C11, оптимизация <code>-O2</code>, группы предупреждений и <code>-Werror</code></td></tr>
+<tr><td><code>CPPFLAGS</code>, <code>LDFLAGS</code></td><td>Стандартные дополнительные флаги препроцессора и компоновщика</td></tr>
+<tr><td><code>ARGS</code></td><td>Аргументы программы для цели <code>run</code>; по умолчанию пусто</td></tr></tbody></table></div>
+<p><code>-Wall</code>, <code>-Wextra</code>, <code>-Wpedantic</code> включают группы предупреждений, а <code>-Werror</code> делает предупреждение ошибкой сборки. Эти флаги не являются математическим доказательством правильности. <code>.PHONY</code> отмечает действия <code>all</code>, <code>run</code>, <code>clean</code>. В начале команд рецепта Makefile требуется табуляция.</p>
+<p>Если компилятор или флаги меняются, уже собранный файл нужно пересобрать: <code>make clean</code>, затем <code>make CC=...</code>, либо <code>make -B CC=...</code>. Изменение значения переменной командной строки само по себе не меняет времён файлов.</p>
+<p>На системе с GNU GCC тот же исходник можно собрать командой <code>make CC=gcc</code>. Это описание переносимого способа сборки; ранее приведённые фактические проверки выполнялись на macOS, а не Linux.</p>
+<h3 id="section-32">Полный Makefile</h3>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">makefile</div><pre><code class="language-makefile">CC = clang
+CFLAGS = -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror
+ARGS =
+
+.PHONY: all run clean
+
+all: mkv_numbers
+
+mkv_numbers: main.c Makefile
+	$(CC) $(CPPFLAGS) $(CFLAGS) main.c $(LDFLAGS) -o $@
+
+run: mkv_numbers
+	./mkv_numbers $(ARGS)
+
+clean:
+	rm -f mkv_numbers
+</code></pre></div>
+<h3 id="section-33">Перенаправление результатов</h3>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">./mkv_numbers --digits 10 --sum 9 &gt; &quot;$HOME/Desktop/mkv_numbers-output.txt&quot;
+</code></pre></div>
+<p>Файл результата создаётся отдельно от исходников. Для десятизначного случая он содержит 3 265 920 строк и 35 925 120 байт при ASCII и LF. Большой поток удобнее направлять в файл, чем отображать целиком в терминале. Для получения одного количества используйте <code>--count-only</code>.</p>
+<h2 id="section-34">14. Примеры запуска и ожидаемые результаты</h2>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">./mkv_numbers --digits 2 --sum 10
+./mkv_numbers --digits 2 --sum 9
+./mkv_numbers --digits 4 --sum 10 --count-only
+</code></pre></div>
+<p>Для <code>--digits 2 --sum 10</code>:</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">19
+28
+37
+46
+64
+73
+82
+91
+</code></pre></div>
+<p>Для <code>--digits 2 --sum 9</code>:</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">18
+27
+36
+45
+54
+63
+72
+81
+90
+</code></pre></div>
+<p>Для <code>--digits 4 --sum 10 --count-only</code>:</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">2376
+</code></pre></div>
+<p>Без аргументов выводятся все 2376 четырёхзначных результатов для S=10. Это не режим подсчёта.</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">./mkv_numbers --digits 10 --sum 10 --count-only
+</code></pre></div>
+<p>Ожидается одна строка <code>3265920</code>. Для <code>--digits 10 --sum 9 --count-only</code> получается то же значение.</p>
+<p>В четырёхзначном обычном потоке <code>1289</code> появляется ровно один раз, хотя есть две пары с суммой 10. <code>1029</code> показывает, что подходящая пара может быть несоседней; внутренний ноль разрешён. <code>1234</code> не выводится при S=10 из-за отсутствия пары; <code>1055</code> не является кандидатом из-за повторения 5.</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">./mkv_numbers --digits -1
+</code></pre></div>
+<p>Неверный параметр даёт код завершения 2, пустой stdout и сообщение в stderr:</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">error: --digits requires decimal digits in range 2..10
+</code></pre></div>
+<p>Это ожидаемая обработка ошибки пользователя, а не отказ алгоритма перечисления.</p>
+<h2 id="section-35">15. Доказательство корректности алгоритма</h2>
+<p>Это доказательство применительно к программе является нашим выводом из лекционного алгоритма.</p>
+<h3 id="section-36">Лемма 1. Корректность перехода перестановки</h3>
+<p>Пусть i — самый правый подъём. Суффикс после i строго убывает, то есть является наибольшим порядком своих элементов. Поэтому следующую большую перестановку невозможно получить изменением только этого суффикса.</p>
+<p>Чтобы изменение было минимально, нужно сохранить позиции до i и увеличить элемент именно в позиции i. Среди допустимых замен выбирается минимальный больший элемент. В убывающем суффиксе это первый больший элемент при просмотре справа.</p>
+<p>После обмена суффикс остаётся убывающим: справа от выбранного элемента были только элементы меньше прежнего pivot, слева — элементы больше выбранного. Его разворот даёт наименьший возможный хвост. Полученная перестановка больше исходной, и никакая другая не может лежать между ними: более раннее изменение больше, меньшая допустимая замена отсутствует, меньший хвост невозможен. Если подъёма нет, исходная перестановка глобально наибольшая.</p>
+<h3 id="section-37">Лемма 2. Корректность дополнения по убыванию</h3>
+<p>Все полные перестановки с фиксированным m-префиксом X образуют один непрерывный блок лексиграфического порядка. Действительно, сравнение с перестановкой другого префикса определяется внутри первых m позиций и не зависит от хвостов.</p>
+<p>Дополнение отсутствующими элементами по убыванию является <strong>последней перестановкой блока X</strong>. Её непосредственный преемник, если существует, является <strong>первой перестановкой следующего блока</strong>. Префикс этого преемника и есть непосредственно следующее размещение. При пропуске какого-либо размещения между блоками существовала бы полная перестановка между двумя непосредственными преемниками, что противоречит лемме 1.</p>
+<p>При дополнении по возрастанию была бы взята первая перестановка текущего блока; следующий переход мог бы изменить только хвост и сохранить X. Поэтому порядок убывания принципиален. При m=10 каждый блок одноэлементный, и лемма остаётся верной.</p>
+<h3 id="section-38">Инвариант длины и различия</h3>
+<p>Начальное X имеет ровно m различных цифр из D и является наименьшим размещением: сначала берётся наименьшая возможная цифра, затем наименьшая ещё не использованная, и так далее.</p>
+<p>Массив <code>used</code> отмечает его цифры. Дополнение добавляет каждый отсутствующий элемент ровно один раз. Получается перестановка всех десяти цифр; обмен и разворот сохраняют её состав и различие. Первые m элементов снова являются размещением требуемой длины. Внешний массив хранит десять ячеек, но значимы только первые m.</p>
+<h3 id="section-39">Корректность фильтров и единственность результата</h3>
+<p>Фильтр <code>digits[0] != 0</code> необходим и достаточен для m-значности десятичной записи: остальные цифры уже допустимы. Ноль внутри числа разрешён.</p>
+<p>Функция <code>has_complementary_pair</code> рассматривает все <span class="math-inline" data-latex="m(m-1)/2"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>m</mi><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x02212;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0002F;</mo><mn>2</mn></mrow></math></span> пар различных позиций <code>i&lt;j</code>. Она возвращает <code>true</code> при первом равенстве суммы S и <code>false</code> только после проверки всех пар. Значит, она реализует квантор существования. Нельзя получить пару из одной позиции, а <code>{5,5}</code> невозможно по инварианту различия.</p>
+<p>Каждый X обрабатывается один раз и имеет единственный вызов вывода. Поэтому <code>1289</code> при S=10, несмотря на пары 1+9 и 2+8, выводится один раз. <code>1029</code> показывает допустимость несоседней пары.</p>
+<p>У каждого допустимого натурального числа есть единственная десятичная запись без ведущего нуля, и она является одним из перечисляемых размещений. Фильтры принимают её. Обратно, каждый выведенный вектор удовлетворяет всем четырём условиям. Получена биекция между допустимыми числами и строками вывода.</p>
+<h3 id="section-40">Числовой порядок</h3>
+<p>Пусть векторы равной длины впервые отличаются в позиции k, причём <span class="math-inline" data-latex="x_k&lt;y_k"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>x</mi><mi>k</mi></msub><mo>&#x0003C;</mo><msub><mi>y</mi><mi>k</mi></msub></mrow></math></span>. Вклад отличия в этой позиции не меньше <span class="math-inline" data-latex="10^{m-k}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mn>10</mn><mrow><mi>m</mi><mo>&#x02212;</mo><mi>k</mi></mrow></msup></mrow></math></span>, тогда как абсолютная разность вкладов всех младших позиций не больше <span class="math-inline" data-latex="10^{m-k}-1"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mn>10</mn><mrow><mi>m</mi><mo>&#x02212;</mo><mi>k</mi></mrow></msup><mo>&#x02212;</mo><mn>1</mn></mrow></math></span>. Поэтому <span class="math-inline" data-latex="N(X)&lt;N(Y)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>N</mi><mo stretchy="false">&#x00028;</mo><mi>X</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003C;</mo><mi>N</mi><mo stretchy="false">&#x00028;</mo><mi>Y</mi><mo stretchy="false">&#x00029;</mo></mrow></math></span>.</p>
+<p>Следовательно, лексиграфический порядок совпадает с числовым. Удаление части членов строго возрастающей последовательности оставляет её строго возрастающей. Фильтрация не нарушает порядок и не требует сортировки.</p>
+<h2 id="section-41">16. Доказательство полноты и завершения перечисления</h2>
+<p>Начинаем с минимального размещения. По лемме 2 раздела 15 каждый успешный шаг даёт ровно непосредственного преемника. Индукцией перечисляются все размещения по порядку, без пропусков и повторений. Строгое увеличение исключает возврат к прежнему объекту.</p>
+<p>Класс конечен и содержит <span class="math-inline" data-latex="A_{10}^m"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>A</mi><mrow><mn>10</mn></mrow><mi>m</mi></msubsup></mrow></math></span> объектов. Последний имеет вид <code>(9,8,...,10−m)</code>. Вместе с убывающим дополнением он образует <code>9876543210</code>, у которого нет подъёма. Алгоритм завершается после обработки последнего размещения. Цикл <code>do ... while</code> обрабатывает и первое, и последнее размещение, а затем проверяет переход; ошибка пропуска границ отсутствует.</p>
+<p>Пусть Y — произвольная допустимая десятичная запись длины m. Она является размещением из D, следовательно, принадлежит конечной цепочке от минимального до максимального размещения. Переход к непосредственному преемнику не может перескочить Y. При её обработке оба фильтра истинны. Поэтому Y выводится, либо учитывается счётчиком в режиме подсчёта. Так полнота генератора вместе с точностью фильтров даёт полноту решения исходной рабочей задачи.</p>
+<h2 id="section-42">17. Доказательство отсутствия повторов</h2>
+<p>Каждый успешный переход <code>next_arrangement</code> строго увеличивает размещение в лексикографическом порядке. Если бы некоторое размещение встретилось дважды, между этими появлениями существовала бы строго возрастающая цепочка, начинающаяся и заканчивающаяся одним объектом. Это невозможно. Следовательно, генератор не повторяет кандидатов.</p>
+<p>При обработке одного размещения счётчик увеличивается не более одного раза и <code>write_number</code> вызывается не более одного раза. <code>has_complementary_pair</code> возвращает логический признак при первой найденной паре, а не запускает вывод для каждой пары. Поэтому несколько подходящих пар внутри одного числа не создают дополнительных строк.</p>
+<p>Разные допустимые размещения длины m без первого нуля задают разные натуральные числа: десятичная запись такого числа единственна. Значит, различие векторов сохраняется и после вывода символов. Совместно с полнотой раздела 16 это означает, что каждое допустимое число выводится ровно один раз.</p>
+<h2 id="section-43">18. Математические контрольные значения</h2>
+<p>Обозначение Q(m,S) относится к количеству результатов, а B_m — к числу всех m-значных натуральных чисел с различными цифрами без ограничения суммы. Таблица задаёт точные значения Q; сведения о способе проверки относятся к этапу разработки.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>m</th><th>S=9</th><th>S=10</th><th>Проверка количества</th><th>Проверка stdout</th></tr></thead><tbody><tr><td>2</td><td>9</td><td>8</td><td>Два математических эталона + C</td><td>Полное сравнение с Python</td></tr>
+<tr><td>3</td><td>216</td><td>184</td><td>То же</td><td>Полное сравнение с Python</td></tr>
+<tr><td>4</td><td>2808</td><td>2376</td><td>То же</td><td>Полное сравнение с Python</td></tr>
+<tr><td>5</td><td>23760</td><td>20688</td><td>То же</td><td>Полное сравнение с Python</td></tr>
+<tr><td>6</td><td>136080</td><td>126480</td><td>То же</td><td>Все строки, инварианты и количество</td></tr>
+<tr><td>7</td><td>544320</td><td>544320</td><td>То же</td><td>Все строки, инварианты и количество</td></tr>
+<tr><td>8</td><td>1632960</td><td>1632960</td><td>То же</td><td>Все строки, инварианты и количество</td></tr>
+<tr><td>9</td><td>3265920</td><td>3265920</td><td>То же</td><td>Все строки, инварианты и количество</td></tr>
+<tr><td>10</td><td>3265920</td><td>3265920</td><td>То же</td><td>Все строки + полное сравнение с Python</td></tr></tbody></table></div>
+<h3 id="section-44">Подсчёт по составам цифр</h3>
+<p>Пусть <span class="math-inline" data-latex="\mathcal T"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi mathvariant="script">T</mi></mrow></math></span> — все m-элементные подмножества D, содержащие хотя бы одну пару с суммой S. Тогда</p>
+<div class="math-block" data-latex="Q(m,S)=\sum_{T\in\mathcal T}
+\left(m!-\mathbf1_{\{0\in T\}}(m-1)!\right)."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x0002C;</mo><mi>S</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><munder><mo>&#x02211;</mo><mrow><mi>T</mi><mo>&#x02208;</mo><mi mathvariant="script">T</mi></mrow></munder><mrow><mo stretchy="true" fence="true" form="prefix">&#x00028;</mo><mi>m</mi><mo>&#x00021;</mo><mo>&#x02212;</mo><msub><mn mathvariant="bold">1</mn><mrow><mo stretchy="false">&#x0007B;</mo><mn>0</mn><mo>&#x02208;</mo><mi>T</mi><mo stretchy="false">&#x0007D;</mo></mrow></msub><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x02212;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo><mo stretchy="true" fence="true" form="postfix">&#x00029;</mo></mrow><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Обоснование: различные множества T дают непересекающиеся классы чисел; для каждого T имеется m! перестановок, из которых ровно <code>(m−1)!</code> начинаются с 0, если он есть. Этот эталон перебирает не больше <span class="math-inline" data-latex="C_{10}^5=252"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>C</mi><mrow><mn>10</mn></mrow><mn>5</mn></msubsup><mo>&#x0003D;</mo><mn>252</mn></mrow></math></span> множеств на одно значение m и не использует переходов C-программы. По смыслу он опирается на связь сочетаний и перестановок [1, PDF 99–100; 5, §1.2.1].</p>
+<h3 id="section-45">Пороговые свойства</h3>
+<p>Следующие утверждения выведены для нашей модели; они не являются цитатами из источников.</p>
+<p>Для S=9 множество D разбито на пять непересекающихся пар. Чтобы не иметь подходящей пары, из каждой можно выбрать не больше одной цифры, то есть максимум пять цифр. Любые шесть различных цифр по принципу Дирихле содержат пару. Граница точна: <code>{0,1,2,3,4}</code> не содержит пары с суммой 9.</p>
+<p>Для S=10 имеются четыре непересекающиеся пары и две отдельные цифры 0 и 5. Без подходящей пары можно выбрать максимум <code>4+2=6</code> цифр. Любые семь различных цифр содержат пару. Граница точна: <code>{0,1,2,3,4,5}</code> пары с суммой 10 не содержит; например, <code>102345</code> не проходит фильтр.</p>
+<p>При m=10 содержатся все цифры: для S=9 существуют все пять пар, для S=10 все четыре. Однако в программе проверка пары не заменена специальным ответом даже за порогом: используется один и тот же алгоритм для всех m.</p>
+<h3 id="section-46">Контроль пограничных длин</h3>
+<p>При m=6, S=9 все <span class="math-inline" data-latex="B_6=136080"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>B</mi><mn>6</mn></msub><mo>&#x0003D;</mo><mn>136080</mn></mrow></math></span> чисел подходят.
+При m=6, S=10 без пары нужно взять 0, 5 и ровно по одному элементу из каждой из четырёх пар. Таких множеств <span class="math-inline" data-latex="2^4=16"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msup><mn>2</mn><mn>4</mn></msup><mo>&#x0003D;</mo><mn>16</mn></mrow></math></span>, и каждое даёт <span class="math-inline" data-latex="6!-5!=600"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>6</mn><mo>&#x00021;</mo><mo>&#x02212;</mo><mn>5</mn><mo>&#x00021;</mo><mo>&#x0003D;</mo><mn>600</mn></mrow></math></span> натуральных чисел. Поэтому
+<span class="math-inline" data-latex="Q(6,10)=136080-16\cdot600=126480"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mn>6</mn><mo>&#x0002C;</mo><mn>10</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>136080</mn><mo>&#x02212;</mo><mn>16</mn><mo>&#x000B7;</mo><mn>600</mn><mo>&#x0003D;</mo><mn>126480</mn></mrow></math></span>.
+При m=7 обе суммы гарантированы: <span class="math-inline" data-latex="Q(7,9)=Q(7,10)=B_7=544320"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mn>7</mn><mo>&#x0002C;</mo><mn>9</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mn>7</mn><mo>&#x0002C;</mo><mn>10</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><msub><mi>B</mi><mn>7</mn></msub><mo>&#x0003D;</mo><mn>544320</mn></mrow></math></span>.</p>
+<h2 id="section-47">19. Формула включения-исключения</h2>
+<p>Теоретическая основа — [5–7, гл. 2, §2.1, формула (2.1), §2.2, теорема 2.1]. Для каждой допустимой пары зададим событие <span class="math-inline" data-latex="E_i"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>E</mi><mi>i</mi></msub></mrow></math></span>: число содержит обе её цифры. Нужна мощность объединения, а не сумма мощностей событий:</p>
+<div class="math-block" data-latex="Q(m,S)=\left|\bigcup_{i=1}^kE_i\right|
+=\sum_{\varnothing\ne J\subseteq\{1,\ldots,k\}}
+(-1)^{|J|+1}\left|\bigcap_{i\in J}E_i\right|."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x0002C;</mo><mi>S</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mrow><mo stretchy="true" fence="true" form="prefix">&#x0007C;</mo><msubsup><mo>&#x022C3;</mo><mrow><mi>i</mi><mo>&#x0003D;</mo><mn>1</mn></mrow><mi>k</mi></msubsup><msub><mi>E</mi><mi>i</mi></msub><mo stretchy="true" fence="true" form="postfix">&#x0007C;</mo></mrow><mo>&#x0003D;</mo><munder><mo>&#x02211;</mo><mrow><mo>&#x02205;</mo><mo>&#x02260;</mo><mi>J</mi><mo>&#x02286;</mo><mo stretchy="false">&#x0007B;</mo><mn>1</mn><mo>&#x0002C;</mo><mi>&#x02026;</mi><mo>&#x0002C;</mo><mi>k</mi><mo stretchy="false">&#x0007D;</mo></mrow></munder><mo stretchy="false">&#x00028;</mo><mo>&#x02212;</mo><mn>1</mn><msup><mo stretchy="false">&#x00029;</mo><mrow><mo stretchy="false">&#x0007C;</mo><mi>J</mi><mo stretchy="false">&#x0007C;</mo><mo>&#x0002B;</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" fence="true" form="prefix">&#x0007C;</mo><msub><mo>&#x022C2;</mo><mrow><mi>i</mi><mo>&#x02208;</mo><mi>J</mi></mrow></msub><msub><mi>E</mi><mi>i</mi></msub><mo stretchy="true" fence="true" form="postfix">&#x0007C;</mo></mrow><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Если число содержит t подходящих пар, его суммарный вес равен
+<span class="math-inline" data-latex="\sum_{j=1}^t(-1)^{j+1}C_t^j=1-(1-1)^t=1"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mo>&#x02211;</mo><mrow><mi>j</mi><mo>&#x0003D;</mo><mn>1</mn></mrow><mi>t</mi></msubsup><mo stretchy="false">&#x00028;</mo><mo>&#x02212;</mo><mn>1</mn><msup><mo stretchy="false">&#x00029;</mo><mrow><mi>j</mi><mo>&#x0002B;</mo><mn>1</mn></mrow></msup><msubsup><mi>C</mi><mi>t</mi><mi>j</mi></msubsup><mo>&#x0003D;</mo><mn>1</mn><mo>&#x02212;</mo><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo>&#x02212;</mo><mn>1</mn><msup><mo stretchy="false">&#x00029;</mo><mi>t</mi></msup><mo>&#x0003D;</mo><mn>1</mn></mrow></math></span>.
+Так исключается многократный подсчёт.</p>
+<p>Пары попарно не пересекаются. Зафиксируем j обязательных пар: они требуют r=2j разных цифр. Обозначим z=1, если среди обязательных цифр есть ноль, иначе z=0. Число допустимых чисел, содержащих фиксированное обязательное множество:</p>
+<div class="math-block" data-latex="F_m(r,z)=C_{10-r}^{m-r}\,m!-
+\begin{cases}
+C_{10-r}^{m-r}\,(m-1)!,&amp;z=1;\\
+C_{9-r}^{m-r-1}\,(m-1)!,&amp;z=0.
+\end{cases}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>F</mi><mi>m</mi></msub><mo stretchy="false">&#x00028;</mo><mi>r</mi><mo>&#x0002C;</mo><mi>z</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><msubsup><mi>C</mi><mrow><mn>10</mn><mo>&#x02212;</mo><mi>r</mi></mrow><mrow><mi>m</mi><mo>&#x02212;</mo><mi>r</mi></mrow></msubsup><mspace width="0.167em" /><mi>m</mi><mo>&#x00021;</mo><mo>&#x02212;</mo><mrow><mo stretchy="true" fence="true" form="prefix">&#x0007B;</mo><mtable><mtr><mtd columnalign="left"><msubsup><mi>C</mi><mrow><mn>10</mn><mo>&#x02212;</mo><mi>r</mi></mrow><mrow><mi>m</mi><mo>&#x02212;</mo><mi>r</mi></mrow></msubsup><mspace width="0.167em" /><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x02212;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo><mo>&#x0002C;</mo></mtd><mtd columnalign="left"><mi>z</mi><mo>&#x0003D;</mo><mn>1</mn><mi>;</mi></mtd></mtr><mtr><mtd columnalign="left"><msubsup><mi>C</mi><mrow><mn>9</mn><mo>&#x02212;</mo><mi>r</mi></mrow><mrow><mi>m</mi><mo>&#x02212;</mo><mi>r</mi><mo>&#x02212;</mo><mn>1</mn></mrow></msubsup><mspace width="0.167em" /><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x02212;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo><mo>&#x0002C;</mo></mtd><mtd columnalign="left"><mi>z</mi><mo>&#x0003D;</mo><mn>0</mn><mo>&#x0002E;</mo></mtd></mtr></mtable></mrow></mrow></math></div>
+
+
+<p>Полагаем <span class="math-inline" data-latex="C_n^q=0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>C</mi><mi>n</mi><mi>q</mi></msubsup><mo>&#x0003D;</mo><mn>0</mn></mrow></math></span>, если <span class="math-inline" data-latex="q&lt;0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>q</mi><mo>&#x0003C;</mo><mn>0</mn></mrow></math></span> или <span class="math-inline" data-latex="q&gt;n"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>q</mi><mo>&#x0003E;</mo><mi>n</mi></mrow></math></span>; невозможные пересечения дают 0. В частности, F_m(r,z)=0 при r&gt;m, а случай r=10,z=0 невозможен, поскольку все десять цифр включают ноль; для него также принимается значение 0, без вычисления сочетания с отрицательным размером множества. Сначала выбираем остальные m−r цифр и переставляем все m цифр. Затем вычитаем записи с первым нулём. Если ноль обязателен, он есть в каждом выбранном множестве. Иначе его нужно отдельно выбрать из необязательных цифр; остаются <code>9−r</code> ненулевых вариантов для <code>m−r−1</code> мест множества. После фиксации нуля слева остаётся <code>(m−1)!</code> порядков.</p>
+<p>Для S=10 ни одна пара не содержит 0, поэтому</p>
+<div class="math-block" data-latex="Q(m,10)=\sum_{j=1}^{4}(-1)^{j+1}C_4^j F_m(2j,0)."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x0002C;</mo><mn>10</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><munderover><mo>&#x02211;</mo><mrow><mi>j</mi><mo>&#x0003D;</mo><mn>1</mn></mrow><mrow><mn>4</mn></mrow></munderover><mo stretchy="false">&#x00028;</mo><mo>&#x02212;</mo><mn>1</mn><msup><mo stretchy="false">&#x00029;</mo><mrow><mi>j</mi><mo>&#x0002B;</mo><mn>1</mn></mrow></msup><msubsup><mi>C</mi><mn>4</mn><mi>j</mi></msubsup><msub><mi>F</mi><mi>m</mi></msub><mo stretchy="false">&#x00028;</mo><mn>2</mn><mi>j</mi><mo>&#x0002C;</mo><mn>0</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Для S=9 одна пара <code>{0,9}</code> содержит 0. Группы из j пар разделяются на не содержащие эту пару и содержащие её:</p>
+<div class="math-block" data-latex="Q(m,9)=\sum_{j=1}^{5}(-1)^{j+1}
+\left[C_4^jF_m(2j,0)+C_4^{j-1}F_m(2j,1)\right]."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x0002C;</mo><mn>9</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><munderover><mo>&#x02211;</mo><mrow><mi>j</mi><mo>&#x0003D;</mo><mn>1</mn></mrow><mrow><mn>5</mn></mrow></munderover><mo stretchy="false">&#x00028;</mo><mo>&#x02212;</mo><mn>1</mn><msup><mo stretchy="false">&#x00029;</mo><mrow><mi>j</mi><mo>&#x0002B;</mo><mn>1</mn></mrow></msup><mrow><mo stretchy="true" fence="true" form="prefix">[</mo><msubsup><mi>C</mi><mn>4</mn><mi>j</mi></msubsup><msub><mi>F</mi><mi>m</mi></msub><mo stretchy="false">&#x00028;</mo><mn>2</mn><mi>j</mi><mo>&#x0002C;</mo><mn>0</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0002B;</mo><msubsup><mi>C</mi><mn>4</mn><mrow><mi>j</mi><mo>&#x02212;</mo><mn>1</mn></mrow></msubsup><msub><mi>F</mi><mi>m</mi></msub><mo stretchy="false">&#x00028;</mo><mn>2</mn><mi>j</mi><mo>&#x0002C;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo stretchy="true" fence="true" form="postfix">]</mo></mrow><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Например, при m=4:
+<span class="math-inline" data-latex="F_4(2,0)=28\cdot24-7\cdot6=630"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>F</mi><mn>4</mn></msub><mo stretchy="false">&#x00028;</mo><mn>2</mn><mo>&#x0002C;</mo><mn>0</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>28</mn><mo>&#x000B7;</mo><mn>24</mn><mo>&#x02212;</mo><mn>7</mn><mo>&#x000B7;</mo><mn>6</mn><mo>&#x0003D;</mo><mn>630</mn></mrow></math></span>,
+<span class="math-inline" data-latex="F_4(2,1)=28\cdot18=504"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>F</mi><mn>4</mn></msub><mo stretchy="false">&#x00028;</mo><mn>2</mn><mo>&#x0002C;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>28</mn><mo>&#x000B7;</mo><mn>18</mn><mo>&#x0003D;</mo><mn>504</mn></mrow></math></span>,
+<span class="math-inline" data-latex="F_4(4,0)=24"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>F</mi><mn>4</mn></msub><mo stretchy="false">&#x00028;</mo><mn>4</mn><mo>&#x0002C;</mo><mn>0</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>24</mn></mrow></math></span>, <span class="math-inline" data-latex="F_4(4,1)=18"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>F</mi><mn>4</mn></msub><mo stretchy="false">&#x00028;</mo><mn>4</mn><mo>&#x0002C;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>18</mn></mrow></math></span>.
+Тогда</p>
+<div class="math-block" data-latex="Q(4,10)=4\cdot630-6\cdot24=2376;
+\quad Q(4,9)=4\cdot630+504-6\cdot24-4\cdot18=2808."><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mn>4</mn><mo>&#x0002C;</mo><mn>10</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>4</mn><mo>&#x000B7;</mo><mn>630</mn><mo>&#x02212;</mo><mn>6</mn><mo>&#x000B7;</mo><mn>24</mn><mo>&#x0003D;</mo><mn>2376</mn><mi>;</mi><mspace width="1em" /><mi>Q</mi><mo stretchy="false">&#x00028;</mo><mn>4</mn><mo>&#x0002C;</mo><mn>9</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mn>4</mn><mo>&#x000B7;</mo><mn>630</mn><mo>&#x0002B;</mo><mn>504</mn><mo>&#x02212;</mo><mn>6</mn><mo>&#x000B7;</mo><mn>24</mn><mo>&#x02212;</mo><mn>4</mn><mo>&#x000B7;</mo><mn>18</mn><mo>&#x0003D;</mo><mn>2808</mn><mo>&#x0002E;</mo></mrow></math></div>
+
+
+<p>Эти специализированные формулы выведены здесь, а не заимствованы в готовом виде из лекций. Основная C-программа их не использует.</p>
+<h2 id="section-48">20. Вычислительная сложность и память</h2>
+<p>Пусть n — размер алфавита, m — длина, A=<span class="math-inline" data-latex="n!/(n-m)!"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>&#x00021;</mo><mo>&#x0002F;</mo><mo stretchy="false">&#x00028;</mo><mi>n</mi><mo>&#x02212;</mo><mi>m</mi><mo stretchy="false">&#x00029;</mo><mo>&#x00021;</mo></mrow></math></span>, Q — число выведенных результатов.</p>
+<p>Инициализация стоит O(m). Построение отметок и дополнения, поиск pivot и замены, разворот и копирование стоят O(n) в худшем случае на переход. Проверка первого нуля O(1), пары — O(m²), точнее не больше <span class="math-inline" data-latex="m(m-1)/2"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>m</mi><mo stretchy="false">&#x00028;</mo><mi>m</mi><mo>&#x02212;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0002F;</mo><mn>2</mn></mrow></math></span> сложений и сравнений. Ранний выход может уменьшить фактическую работу, но не худшую оценку. Генерируются все A размещений, включая ведущие нули.</p>
+<p>Вычисления без внешнего вывода требуют O(A·(n+m²)). Формирование строк требует дополнительно O(Qm), а передаваемый объём равен Q·(m+1) байтам для ASCII и LF. Физическое время записи зависит от терминала, трубы, файла и файловой системы; оно не определяется одной асимптотикой генератора. <code>--count-only</code> убирает Q строк, но сохраняет весь перебор и проверку пары.</p>
+<p>Для фиксированного n=10 число проверок пары не больше 45, переход использует только десять элементов; время пропорционально числу размещений с небольшой постоянной. При m=10 A=3628800, Q=3265920; вывод имеет 35 925 120 байт для каждой суммы, без сохранения этого объёма внутри программы.</p>
+<p>Основные данные C: массив текущего размещения из 10 int, временная перестановка из 10 int, 10 отметок bool, буфер строки из 11 char, локальные параметры и счётчик. Используется O(n) дополнительной памяти, при фиксированных десяти цифрах — O(1). Буфер stdio не растёт с количеством результатов. Стек имеет постоянную глубину, <code>malloc</code> и хранение всех результатов не нужны.</p>
+<p>C11 выбран из-за прозрачных массивов, явных переходов и простого стандартного интерфейса ввода-вывода. Это не утверждение о превосходстве C над C++ по скорости при одинаковом алгоритме.</p>
+<h2 id="section-49">21. Результаты проверок на этапе разработки</h2>
+<p>Ниже приведён исторический отчёт о выполненных 19.10.2026 проверках принятого <code>main.c</code>. Повторные масштабные тесты для подготовки чистовой копии не требовались. Тестовые сценарии и полные журналы сохранены в исходной рабочей папке разработки, но <strong>не входят в этот четырёхфайловый проект</strong>. Здесь нет целей запуска Python-тестов; приведённые результаты не означают наличия этих средств в репозитории.</p>
+<p>Проверенный SHA-256 <code>main.c</code>:</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">text</div><pre><code class="language-text">abd867169e7a3796774b3b5bc90a8fb972d99abbc3b0aa87de785a28299ad4d8
+</code></pre></div>
+<h3 id="section-50">Первоначальная полная проверка</h3>
+<p>Платформа — macOS arm64. Использовались Apple Clang 21.0.0 и настоящий Homebrew GCC 15.2.0. Основные сборки выполнялись с C11, <code>-O2</code> и строгими предупреждениями; диагностическая сборка — с <code>-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer</code> и теми же предупреждениями.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Сборка</th><th>Строгая компиляция</th><th>Группы тестов</th><th>Время тестов</th><th>Больших строк проверено</th><th>Результат</th></tr></thead><tbody><tr><td>Apple Clang 21.0.0, <code>-O2</code></td><td>Без предупреждений</td><td>8, без пропусков</td><td>61.751 с</td><td>17680800</td><td>OK</td></tr>
+<tr><td>Homebrew GCC 15.2.0, <code>-O2</code></td><td>Без предупреждений</td><td>8, без пропусков</td><td>62.010 с</td><td>17680800</td><td>OK</td></tr>
+<tr><td>Clang 21.0.0, ASan + UBSan</td><td>Без предупреждений</td><td>8, без пропусков</td><td>63.628 с</td><td>17680800</td><td>OK, диагностик санитайзеров нет</td></tr></tbody></table></div>
+<p>Время включает проверки Python и вывод в трубу; это не измерение чистой производительности генератора. Все три процесса завершились с кодом 0. Во всех трёх прогонах проверены 18 количеств, 8 полных малых последовательностей, 58 ошибочных вызовов CLI, ошибки записи и закрытая труба. В каждом прогоне для m=10 проверено по 3265920 строк для обеих сумм с полным независимым построчным эталоном, а не только счётчиком.</p>
+<h3 id="section-51">Повторная полная проверка</h3>
+<p>Начало: <code>2026-10-19T13:09:31.945541+03:00</code>. Окончание: <code>2026-10-19T13:12:36.202498+03:00</code>. Часовой пояс — Москва (<code>+03:00</code>).</p>
+<p>Платформа: <code>macOS-27.0.1-arm64-arm-64bit</code>. Python: <code>3.9.6 (default, Aug 25 2026, 21:26:21) </code>.</p>
+<p>Точные версии: <code>Apple clang version 21.0.0 (clang-2100.3.34.2)</code>; <code>gcc-15 (Homebrew GCC 15.2.0) 15.2.0</code>.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Сборка</th><th>Группы тестов</th><th>Время тестового сценария</th><th>Больших строк проверено</th><th>Итог</th></tr></thead><tbody><tr><td>Apple Clang 21, обычная сборка</td><td>8, без пропусков</td><td>60.722 с</td><td>17 680 800</td><td>OK</td></tr>
+<tr><td>GNU GCC 15, обычная сборка</td><td>8, без пропусков</td><td>59.887 с</td><td>17 680 800</td><td>OK</td></tr>
+<tr><td>Apple Clang 21, ASan + UBSan</td><td>8, без пропусков</td><td>62.169 с</td><td>17 680 800</td><td>OK</td></tr></tbody></table></div>
+<p>В каждом из трёх прогонов проверены все 18 количеств, восемь полных малых последовательностей, 58 некорректных CLI-вызовов, ошибки stdout и закрытая труба. Для m=10 и S=9,10 проверены все 3 265 920 строк каждого потока с построчным эталоном Python. Всего три окончательных прогона проверили 53 042 400 больших строк. Отдельные дополнительные запуски count-only и короткие примеры не включены в это число.</p>
+<p>Статический анализ Apple Clang завершился с кодом 0, без диагностик. Обычные вызовы и сборки завершились с ожидаемым кодом 0; намеренно неверный вызов <code>--digits -1</code> завершился с ожидаемым кодом 2. Равенство фактического и ожидаемого кода проверено для каждой команды.</p>
+<h3 id="section-52">Наблюдение об инструментарии ASan</h3>
+<p>В первой попытке повторной серии PATH интерактивного терминала выбрал Homebrew Clang 19.1.7. Обычные сборки Clang и GCC прошли полный набор, а диагностический исполняемый файл зависал до входа в <code>main</code>. Профиль показывал инициализацию ASan: <code>InitializeShadowMemory</code>, <code>get_dyld_hdr</code>, повторный <code>AsanInitFromRtl</code> и ожидание <code>StaticSpinMutex::LockSlow</code>. Эта попытка считалась неуспешной. Это наблюдение о старой среде ASan в данной конфигурации macOS, а не сообщение о нарушении памяти в алгоритме и не утверждение о любой установке Clang 19.</p>
+<p>Повторная серия с явно выбранным <code>/usr/bin/clang</code> (Apple Clang 21) прошла без диагностик ASan/UBSan, без изменения принятого исходника и без отключения проверок.</p>
+<h3 id="section-53">Статический анализ и границы результата</h3>
+<p>На этапе разработки выполнена команда:</p>
+<div class="code-wrap"><div class="code-label" aria-hidden="true">sh</div><pre><code class="language-sh">clang --analyze -std=c11 -Wall -Wextra -Wpedantic -Werror \
+  -Xanalyzer -analyzer-output=text main.c
+</code></pre></div>
+<p>Код завершения 0, диагностик не было. На Linux программа в описанных сериях не запускалась; стандартный C11 и команды для другого компилятора не подменяют фактическую проверку на этой платформе.</p>
+<p>До принятия текущего исходника GNU GCC сообщил <code>digits may be used uninitialized</code>: анализатор не доказал нижнюю границу длины через разбор аргументов. Тогда массив был явно инициализирован нулями; предупреждения не отключались, все сборки и проверки были повторены после исправления. Это история разработки; в чистовой копии принятый <code>main.c</code> не изменён.</p>
+<h3 id="section-54">Что именно проверялось</h3>
+<p>Независимые сценарии разработки не импортировали функцию перехода C и не воспроизводили её алгоритм. Для проверки использовались отдельное перечисление перестановок, подсчёт по подмножествам и включение-исключение. Ниже описаны их устройство и покрытие; это исторический разбор проверки, а не инструкция запуска отсутствующих средств.</p>
+<h3 id="section-55">Устройство независимых эталонов на этапе разработки</h3>
+<p><code>subset_count</code> перебирает <code>itertools.combinations(range(10), length)</code>. Порядок элементов множества на этом этапе несущественен. Для каждого подходящего состава добавляется <code>m!</code> или <code>m!-(m-1)!</code>. Эта функция не знает, как C строит следующий вектор.</p>
+<p><code>intersection_count</code> вычисляет размер одного пересечения событий обязательных пар с учётом наличия нуля. <code>inclusion_exclusion_count</code> группирует пересечения по количеству пар. Это другой способ подсчёта, чем перечисление всех подмножеств.</p>
+<p><code>reference_lines</code> получает упорядоченные кортежи от <code>itertools.permutations</code>, отдельно проверяет первый ноль и существование пары. Возвращаются именно байтовые строки с LF, поэтому сравнение замечает даже лишний заголовок, пробел, пропущенный перевод строки или неверный порядок.</p>
+<p>Константа <code>CONTROL</code> хранит заданную таблицу как третий ориентир. Она не используется для генерации эталона. Если бы таблица оказалась неверной, сравнение с двумя вычисляемыми формулами показало бы расхождение.</p>
+<h3 id="section-56">Что проверяет каждая из восьми групп</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th>Группа</th><th>Действие</th><th>Какую ошибку обнаруживает</th></tr></thead><tbody><tr><td><code>test_01_small_sequences</code></td><td>Для m=2..5, S=9/10 сравнивает весь список с Python, затем инварианты</td><td>Пропуск, дубль, перестановка строк, неверная цифра или формат, совпадающее количество при разном содержимом</td></tr>
+<tr><td><code>test_02_counts_and_formulas</code></td><td>18 запусков count-only; сравнение C, подмножеств, включения-исключения и таблицы</td><td>Неверное число результатов, ведущий ноль в подсчёте, неправильная сумма, ошибочные пороговые случаи</td></tr>
+<tr><td><code>test_03_examples_and_defaults</code></td><td>Точные двухзначные примеры, значения по умолчанию, все 6 порядков опций, выбранные четырёхзначные записи</td><td>Неиспользованный параметр, неправильный default, зависимость от порядка опций, ограничение «ровно одна» или «соседняя пара»</td></tr>
+<tr><td><code>test_04_help</code></td><td>Отдельный <code>--help</code>, код 0, пустой stderr, обязательные сведения</td><td>Недоступная или неполная справка</td></tr>
+<tr><td><code>test_05_invalid_cli</code></td><td>58 некорректных вызовов, код 2, пустой stdout и диагностика stderr</td><td>Нестрогий разбор, переполнение, повторные опции, скрытый старт перечисления при ошибке</td></tr>
+<tr><td><code>test_06_write_errors</code></td><td>Вывод результатов, счётчика и справки в read-only дескриптор</td><td>Игнорирование немедленной или отложенной ошибки stdout</td></tr>
+<tr><td><code>test_07_closed_pipe</code></td><td>Получатель трубы закрыт ещё до старта программы</td><td>Ошибочное успешное завершение при недоступном получателе</td></tr>
+<tr><td><code>test_08_full_streams</code></td><td>В полном режиме читает все результаты m=6..10, S=9/10 по одному; для m=10 сравнивает с полным эталоном</td><td>Ошибки больших индексов, переполнение представления, нарушение порядка, лишние/недостающие строки</td></tr></tbody></table></div>
+<p><code>unittest</code> считает это восемью группами, а не восемью отдельными входными наборами. Внутри групп есть циклы и <code>subTest</code>; фактических вызовов программы существенно больше восьми.</p>
+<h3 id="section-57">Инварианты одной строки</h3>
+<p><code>check_line</code> проверяет длину <code>m+1</code> вместе с LF, цифры ASCII, ненулевую первую цифру, m различных символов, подходящую пару, строгое увеличение и диапазон <code>[10^(m−1), 10^m)</code>. В Python обход байтов возвращает их числовые коды, поэтому в проверке пары сравнивают сумму кодов с <code>S + 2*ord(&#39;0&#39;)</code>.</p>
+<p>Для m=6..9 достаточно совокупности трёх фактов: все выведенные элементы допустимы, они различны, их количество равно независимо найденному размеру всего допустимого множества. Конечное подмножество с той же мощностью совпадает со всем множеством. Это объясняет, почему потоковая проверка вместе с формулой устанавливает полноту, даже без отдельного списка всех эталонных строк этих длин.</p>
+<p>Для m=10 выполняется более сильная непосредственная проверка: следующая строка C сравнивается со следующим элементом независимого итератора Python. После конца C дополнительно проверяется, что и Python закончился. Условия на сумму гарантированы использованием всех цифр, но каждая полученная строка всё равно проходит обычную проверку пары.</p>
+<p>На этапе разработки большой поток проверялся в полном режиме. В сокращённом режиме восьмая группа пропускалась; такой запуск не считался полной проверкой stdout.</p>
+<h3 id="section-58">Память, stderr и завершение дочерних процессов</h3>
+<p>Малые последовательности можно сравнивать в памяти: максимум 23 760 строк. Большие потоки читаются через <code>Popen(..., stdout=PIPE)</code> по одной строке. Хранить миллионы результатов не требуется.</p>
+<p>stderr большого запуска направляется во временный файл, затем проверяется на пустоту. Это не позволяет непрочитанной трубе stderr заблокировать дочерний процесс. В <code>finally</code> ещё работающий процесс прекращается и ожидается его завершение, поэтому провал утверждения не оставляет генератор работающим в фоне.</p>
+<p>Санитайзер обнаруживает только ошибки на реально выполненных путях; он не заменяет доказательство полноты или сравнение результатов. Математический эталон тоже не заменяет проверку безопасности обращений к памяти. Здесь способы дополняют друг друга.</p>
+<p>Сборка без предупреждений показывает принятие исходника конкретным компилятором. Статический анализ и санитайзеры проверяют реализацию на доступных путях. Сравнение последовательностей и инварианты проверяют содержимое потока, независимые формулы — мощность множества, а доказательства разделов 15–17 объясняют корректность перехода во всём допустимом диапазоне. Эти способы дополняют друг друга.</p>
+<h2 id="section-59">22. Вопросы и ответы для защиты</h2>
+<ol>
+<li><strong>Почему размещения?</strong> Выбирается m различных цифр из десяти, и их порядок меняет число.</li>
+<li><strong>Чем они отличаются от перестановок?</strong> Перестановка использует все элементы выбранного исходного множества; размещение из десяти по m может использовать только часть. При m=10 классы совпадают.</li>
+<li><strong>Почему цифры не повторяются?</strong> Это условие задания; начальное размещение и каждый переход сохраняют различие.</li>
+<li><strong>Почему запрещён первый ноль?</strong> Иначе запись не является m-значным натуральным числом; ноль внутри разрешён.</li>
+<li><strong>Почему лексиграфический порядок?</strong> Для записей равной длины он совпадает с числовым и даёт возрастающий stdout без сортировки.</li>
+<li><strong>Как формируется следующее размещение?</strong> Дополнение отсутствующими цифрами по убыванию, следующая полная перестановка, первые m позиций.</li>
+<li><strong>Зачем убывающее дополнение?</strong> Оно ставит нас в конец блока полных перестановок с текущим префиксом; следующий шаг меняет префикс на непосредственный следующий.</li>
+<li><strong>Как определить конец?</strong> Дополненная перестановка целиком убывает, поэтому индекс подъёма не найден. Последний префикс <code>(9,8,...,10−m)</code>.</li>
+<li><strong>Почему нет пропусков?</strong> Каждый шаг переходит к следующему блоку префиксов, а начало минимально.</li>
+<li><strong>Почему нет повторов?</strong> Префикс строго увеличивается; его фильтрация не повторяет вызов вывода.</li>
+<li><strong>Как проверяется пара?</strong> Два цикла по всем i&lt;j до первого совпадения суммы с S.</li>
+<li><strong>Почему достаточно одной?</strong> В условии стоит «хоть в 1 паре», то есть квантор существования, не требование ровно одной пары.</li>
+<li><strong>Что происходит при m=10?</strong> Дополнение пусто, перебираются все 10! перестановок; после исключения 9! ведущих нулей остаётся 3265920 результатов для обеих сумм.</li>
+<li><strong>Почему есть пороги?</strong> Без пары S=9 можно взять максимум одну цифру из каждой из пяти пар; для S=10 к четырём одиночным выборам можно добавить 0 и 5.</li>
+<li><strong>Зачем включение-исключение?</strong> Независимо проверить количество при перекрывающихся событиях нескольких пар; в генератор оно не встроено.</li>
+<li><strong>Как программа была проверена при разработке?</strong> Полные малые последовательности, два математических подсчёта для всех параметров, большие потоки, полный десятизначный эталон, CLI, ошибки stdout, два компилятора и санитайзеры.</li>
+<li><strong>Почему C11?</strong> Достаточно фиксированных массивов и стандартных функций; ход алгоритма открыт для объяснения, C++ и библиотеки не нужны.</li>
+<li><strong>Что с неверными аргументами?</strong> Полная проверка до перечисления; ошибка в stderr, код 2, stdout пуст. Повторы и смешанный <code>--help</code> запрещены.</li>
+<li><strong>Какова сложность?</strong> O(A·(n+m²)) вычислений, дополнительно O(Qm) формирования вывода; память O(n).</li>
+<li><strong>Почему не храним все числа?</strong> Для перехода нужно только текущее размещение; для подсчёта — один счётчик, для вывода — одна строка.</li>
+<li><strong>Нужен ли Python для программы?</strong> Нет. Он использовался только независимыми проверками на этапе разработки. Чистовая сборка и запуск выполняются Clang напрямую либо через Makefile.</li>
+<li><strong>Зачем два формата документации?</strong> README — основной Markdown-источник для GitHub и редактора, HTML — автономная визуальная версия с тем же материалом и встроенной математикой.</li>
+<li><strong>Что делает <code>make run ARGS=&quot;--digits 4 --sum 10&quot;</code>?</strong> При необходимости собирает программу, затем запускает её с указанными аргументами. Без ARGS запускается обычный режим по умолчанию.</li>
+<li><strong>Какая часть условия остаётся неоднозначной?</strong> Исходная фраза не определяет однозначно длину и сумму дополнения. Программа реализует явно принятую модель, поддерживает обе суммы и частный случай m=10; этот выбор не выдаётся за уточнённое требование преподавателя.</li>
+</ol>
+<h2 id="section-60">23. Использованная литература</h2>
+<p>Нумерация соответствует ссылкам в разделе 4 и доказательствах. Названия локальных файлов приведены для идентификации изученных учебных материалов. Они не являются файлами чистового проекта и не требуются для компиляции или запуска.</p>
+<ol>
+<li>Волосатова Т.М., Родионов С.В. <strong>Методы комбинаторных вычислений</strong>. М.: Издательство МГТУ им. Н.Э. Баумана, 2011. 103, [1] с. Файл: <code>Lektsii_Metody_Kombinatornykh_vychisleniy (1).pdf</code>.</li>
+<li><strong>МКВ. Лекции. 1 модуль</strong>. Файл <code>МКВ_лекции_1_модуль (1).docx</code>. Использованы разделы введения и сочетаний.</li>
+<li><strong>Перестановки различных элементов</strong>. Файл <code>мкв_5семесттр/Лекции_ 2 модуль/01-10-2022-ПЕРЕСТАНОВКИ_РАЗЛИЧНЫХ_ЭЛЕМЕНТОВ.pdf</code>.</li>
+<li><strong>Лабораторная № 2. Перечисление перестановок различных элементов</strong>. Файл <code>мкв_5семесттр/Лекции_ 2 модуль/12-10-2020-Перечисление_перестановок_различных_элементов_лаб_2.docx</code>.</li>
+<li>Жуков А.Е., Жуков Д.А. <strong>Элементы комбинаторики</strong>. М.: Издательство МГТУ им. Н.Э. Баумана, 2014. 99, [5] с. ISBN 978-5-7038-3752-8. Файл <code>A_E_Zhukov_D_A_Zhukov_Moskovskiy_gos_tekhnicheskiy_un_t_im_N_E_Baumana — копия.docx</code> (перед тире в исходном имени неразрывный пробел).</li>
+<li><strong>Глава 2. Формула включения-исключения</strong>. Файл <code>Глава 2_формула_Вкл-Искл(2).docx</code>.</li>
+<li>Та же глава, файл <code>Глава 2_формула_включения-исключения.docx</code>. Повторяющийся материал не является вторым независимым доказательством.</li>
+<li><strong>Цикловые классы подстановок и перестановок</strong>. Файл <code>ЦИКЛОВЫЕ КЛАССЫ ПОДСТАНОВОК И ПЕРЕСТАНОВОК — копия(1).docx</code> (перед тире в исходном имени неразрывный пробел).</li>
+<li><strong>Размещения различных элементов</strong>. Файл <code>мкв_5семесттр/Лекции_ 2 модуль/РАЗМЕЩЕНИЯ РАЗЛИЧНЫХ ЭЛЕМЕНТОВ.docx</code>.</li>
+</ol>
+</article><footer class="end-note">Документ автономен: формулы MathML и код встроены. Основной текстовый источник: README.md.</footer></main></div><script>if(matchMedia('(max-width:760px)').matches)document.querySelector('.sidebar details').open=false;</script></body></html>
